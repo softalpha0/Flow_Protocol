@@ -4,16 +4,23 @@ import { useState } from "react";
 import { useCurrentAccount, useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import Navbar from "@/components/Navbar";
-import { PACKAGE_ID } from "@/constants";
+import { PACKAGE_ID, COIN_TYPES } from "@/constants";
 import { suiToMist } from "@/lib/sui";
 
 type Recipient = { address: string; amount: string };
+
+const COIN_OPTIONS = [
+  { label: "SUI", value: COIN_TYPES.SUI },
+  { label: "USDC", value: COIN_TYPES.USDC },
+  { label: "USDT", value: COIN_TYPES.USDT },
+];
 
 export default function Send() {
   const account = useCurrentAccount();
   const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
 
   const [mode, setMode] = useState<"single" | "split">("single");
+  const [coinType, setCoinType] = useState(COIN_TYPES.SUI);
   const [singleRecipient, setSingleRecipient] = useState("");
   const [singleAmount, setSingleAmount] = useState("");
   const [recipients, setRecipients] = useState<Recipient[]>([
@@ -38,6 +45,7 @@ export default function Send() {
   }
 
   const totalSplit = recipients.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+  const coinLabel = COIN_OPTIONS.find((o) => o.value === coinType)?.label;
 
   async function handleSend() {
     if (!account) return;
@@ -52,6 +60,7 @@ export default function Send() {
         const [coin] = tx.splitCoins(tx.gas, [amount]);
         tx.moveCall({
           target: `${PACKAGE_ID}::instant::send`,
+          typeArguments: [coinType],
           arguments: [coin, tx.pure.address(singleRecipient)],
         });
       } else {
@@ -61,6 +70,7 @@ export default function Send() {
         const [coin] = tx.splitCoins(tx.gas, [total]);
         tx.moveCall({
           target: `${PACKAGE_ID}::instant::split_send`,
+          typeArguments: [coinType],
           arguments: [
             coin,
             tx.pure.vector("address", addrs),
@@ -73,7 +83,7 @@ export default function Send() {
         { transaction: tx },
         {
           onSuccess: () => {
-            setSuccess("Payment sent successfully.");
+            setSuccess("Payment sent.");
             setSingleRecipient("");
             setSingleAmount("");
             setRecipients([{ address: "", amount: "" }, { address: "", amount: "" }]);
@@ -104,30 +114,49 @@ export default function Send() {
         <h1 className="text-2xl font-bold mb-2">Send</h1>
         <p className="text-sm text-[#6B7280] mb-8">Instant payment to one or many addresses.</p>
 
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setMode("single")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              mode === "single"
-                ? "bg-[#7C3AED] text-white"
-                : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
-            }`}
-          >
-            Single
-          </button>
-          <button
-            onClick={() => setMode("split")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              mode === "split"
-                ? "bg-[#7C3AED] text-white"
-                : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
-            }`}
-          >
-            Split
-          </button>
-        </div>
-
         <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Asset</label>
+            <div className="flex gap-2">
+              {COIN_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setCoinType(opt.value)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    coinType === opt.value
+                      ? "bg-[#7C3AED] text-white"
+                      : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => setMode("single")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                mode === "single"
+                  ? "bg-[#1A1A2E] text-white border border-[#7C3AED]"
+                  : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
+              }`}
+            >
+              Single
+            </button>
+            <button
+              onClick={() => setMode("split")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                mode === "split"
+                  ? "bg-[#1A1A2E] text-white border border-[#7C3AED]"
+                  : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
+              }`}
+            >
+              Split
+            </button>
+          </div>
+
           {mode === "single" ? (
             <>
               <div>
@@ -141,48 +170,55 @@ export default function Send() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Amount (SUI)</label>
-                <input
-                  type="number"
-                  value={singleAmount}
-                  onChange={(e) => setSingleAmount(e.target.value)}
-                  placeholder="1.0"
-                  step="0.01"
-                  min="0"
-                  className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED]"
-                />
+                <label className="block text-sm font-medium mb-1">Amount</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={singleAmount}
+                    onChange={(e) => setSingleAmount(e.target.value)}
+                    placeholder="1.0"
+                    step="0.01"
+                    min="0"
+                    className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] pr-16"
+                  />
+                  <span className="absolute right-4 top-3 text-sm text-[#6B7280]">{coinLabel}</span>
+                </div>
               </div>
             </>
           ) : (
             <>
               {recipients.map((r, i) => (
-                <div key={i} className="flex gap-2 items-start">
-                  <div className="flex-1">
+                <div key={i} className="space-y-2">
+                  <div className="flex gap-2 items-center">
+                    <span className="text-xs text-[#6B7280] w-5">{i + 1}</span>
                     <input
                       type="text"
                       value={r.address}
                       onChange={(e) => updateRecipient(i, "address", e.target.value)}
                       placeholder="0x..."
-                      className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] font-mono mb-2"
+                      className="flex-1 px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] font-mono"
                     />
-                    <input
-                      type="number"
-                      value={r.amount}
-                      onChange={(e) => updateRecipient(i, "amount", e.target.value)}
-                      placeholder="SUI amount"
-                      step="0.01"
-                      min="0"
-                      className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED]"
-                    />
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={r.amount}
+                        onChange={(e) => updateRecipient(i, "amount", e.target.value)}
+                        placeholder="0.0"
+                        step="0.01"
+                        min="0"
+                        className="w-28 px-3 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] pr-10"
+                      />
+                      <span className="absolute right-3 top-3 text-xs text-[#6B7280]">{coinLabel}</span>
+                    </div>
+                    {recipients.length > 2 && (
+                      <button
+                        onClick={() => removeRecipient(i)}
+                        className="text-[#6B7280] hover:text-[#EF4444] text-sm"
+                      >
+                        x
+                      </button>
+                    )}
                   </div>
-                  {recipients.length > 2 && (
-                    <button
-                      onClick={() => removeRecipient(i)}
-                      className="mt-3 text-[#6B7280] hover:text-[#EF4444] text-sm"
-                    >
-                      Remove
-                    </button>
-                  )}
                 </div>
               ))}
               <button
@@ -192,7 +228,7 @@ export default function Send() {
                 + Add recipient
               </button>
               {totalSplit > 0 && (
-                <p className="text-xs text-[#6B7280]">Total: {totalSplit.toFixed(4)} SUI</p>
+                <p className="text-xs text-[#6B7280]">Total: {totalSplit.toFixed(4)} {coinLabel}</p>
               )}
             </>
           )}

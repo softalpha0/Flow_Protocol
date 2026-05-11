@@ -5,8 +5,14 @@ import { useCurrentAccount, useSignAndExecuteTransaction } from "@mysten/dapp-ki
 import { Transaction } from "@mysten/sui/transactions";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { PACKAGE_ID } from "@/constants";
+import { PACKAGE_ID, COIN_TYPES } from "@/constants";
 import { suiToMist } from "@/lib/sui";
+
+const COIN_OPTIONS = [
+  { label: "SUI", value: COIN_TYPES.SUI },
+  { label: "USDC", value: COIN_TYPES.USDC },
+  { label: "USDT", value: COIN_TYPES.USDT },
+];
 
 export default function NewPact() {
   const account = useCurrentAccount();
@@ -15,8 +21,9 @@ export default function NewPact() {
 
   const [recipient, setRecipient] = useState("");
   const [description, setDescription] = useState("");
-  const [depositSui, setDepositSui] = useState("");
+  const [amount, setAmount] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [coinType, setCoinType] = useState(COIN_TYPES.SUI);
   const [error, setError] = useState("");
 
   async function handleCreate() {
@@ -24,17 +31,17 @@ export default function NewPact() {
     setError("");
 
     try {
-      const depositMist = suiToMist(depositSui);
+      const amountMist = suiToMist(amount);
       const deadlineMs = deadline ? new Date(deadline).getTime() : 0;
-
-      const tx = new Transaction();
-      const [coin] = tx.splitCoins(tx.gas, [depositMist]);
-
       const descBytes = Array.from(new TextEncoder().encode(description));
       const blobBytes: number[] = [];
 
+      const tx = new Transaction();
+      const [coin] = tx.splitCoins(tx.gas, [amountMist]);
+
       tx.moveCall({
         target: `${PACKAGE_ID}::pact::create_pact`,
+        typeArguments: [coinType],
         arguments: [
           tx.pure.address(recipient),
           tx.pure.vector("u8", descBytes),
@@ -46,10 +53,7 @@ export default function NewPact() {
       });
 
       signAndExecute(
-        {
-          transaction: tx,
-          options: { showEffects: true, showObjectChanges: true },
-        },
+        { transaction: tx, options: { showObjectChanges: true } },
         {
           onSuccess: (result) => {
             const created = result.objectChanges?.find(
@@ -89,6 +93,25 @@ export default function NewPact() {
 
         <div className="space-y-4">
           <div>
+            <label className="block text-sm font-medium mb-1">Asset</label>
+            <div className="flex gap-2">
+              {COIN_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setCoinType(opt.value)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    coinType === opt.value
+                      ? "bg-[#7C3AED] text-white"
+                      : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1">Recipient address</label>
             <input
               type="text"
@@ -98,6 +121,7 @@ export default function NewPact() {
               className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] font-mono"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Description / milestone terms</label>
             <textarea
@@ -108,18 +132,25 @@ export default function NewPact() {
               className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] resize-none"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium mb-1">Amount (SUI)</label>
-            <input
-              type="number"
-              value={depositSui}
-              onChange={(e) => setDepositSui(e.target.value)}
-              placeholder="5.0"
-              step="0.01"
-              min="0"
-              className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED]"
-            />
+            <label className="block text-sm font-medium mb-1">Amount</label>
+            <div className="relative">
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="5.0"
+                step="0.01"
+                min="0"
+                className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] pr-16"
+              />
+              <span className="absolute right-4 top-3 text-sm text-[#6B7280]">
+                {COIN_OPTIONS.find((o) => o.value === coinType)?.label}
+              </span>
+            </div>
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Deadline (optional)</label>
             <input
@@ -136,7 +167,7 @@ export default function NewPact() {
 
           <button
             onClick={handleCreate}
-            disabled={isPending || !recipient || !description || !depositSui}
+            disabled={isPending || !recipient || !description || !amount}
             className="w-full py-3 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors"
           >
             {isPending ? "Creating..." : "Lock Funds in Pact"}

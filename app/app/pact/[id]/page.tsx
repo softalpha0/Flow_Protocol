@@ -15,33 +15,37 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   "3": { label: "Cancelled", color: "text-[#6B7280] bg-[#6B728020]" },
 };
 
+function extractCoinType(objectType: string): string {
+  const match = objectType.match(/<(.+)>$/);
+  return match ? match[1] : "0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI";
+}
+
 export default function PactDetail() {
   const { id } = useParams<{ id: string }>();
   const account = useCurrentAccount();
   const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
-
-  const { data, isLoading, refetch } = useSuiClientQuery("getObject", {
-    id,
-    options: { showContent: true },
-  });
-
-  const fields = (data?.data?.content as { fields?: Record<string, string> })?.fields;
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const { data, isLoading, refetch } = useSuiClientQuery("getObject", {
+    id,
+    options: { showContent: true, showType: true },
+  });
+
+  const objectType = data?.data?.type ?? "";
+  const coinType = extractCoinType(objectType);
+  const content = data?.data?.content as { fields?: Record<string, string> } | undefined;
+  const fields = content?.fields;
+
   function handleComplete() {
-    if (!account || !fields) return;
+    if (!account) return;
     setError(""); setSuccess("");
-
     const tx = new Transaction();
-    const [coin] = tx.splitCoins(tx.gas, [BigInt(fields.amount)]);
-
     tx.moveCall({
       target: `${PACKAGE_ID}::pact::complete_pact`,
-      arguments: [tx.object(id), coin, tx.object("0x6")],
+      typeArguments: [coinType],
+      arguments: [tx.object(id), tx.object("0x6")],
     });
-
     signAndExecute(
       { transaction: tx },
       {
@@ -52,17 +56,14 @@ export default function PactDetail() {
   }
 
   function handleCancel() {
-    if (!account || !fields) return;
+    if (!account) return;
     setError(""); setSuccess("");
-
     const tx = new Transaction();
-    const [coin] = tx.splitCoins(tx.gas, [BigInt(fields.amount)]);
-
     tx.moveCall({
       target: `${PACKAGE_ID}::pact::cancel_pact`,
-      arguments: [tx.object(id), coin],
+      typeArguments: [coinType],
+      arguments: [tx.object(id)],
     });
-
     signAndExecute(
       { transaction: tx },
       {
@@ -75,14 +76,12 @@ export default function PactDetail() {
   function handleDispute() {
     if (!account) return;
     setError(""); setSuccess("");
-
     const tx = new Transaction();
-
     tx.moveCall({
       target: `${PACKAGE_ID}::pact::dispute_pact`,
+      typeArguments: [coinType],
       arguments: [tx.object(id)],
     });
-
     signAndExecute(
       { transaction: tx },
       {
@@ -92,11 +91,10 @@ export default function PactDetail() {
     );
   }
 
-  const isSender = account?.address === fields?.sender;
-  const isRecipient = account?.address === fields?.recipient;
-  const isPending2 = fields?.status === "0";
+  const isSender = account?.address?.toLowerCase() === fields?.sender?.toLowerCase();
+  const isRecipient = account?.address?.toLowerCase() === fields?.recipient?.toLowerCase();
+  const isPending2 = fields?.status === "0" || fields?.status === 0 || String(fields?.status) === "0";
   const statusInfo = STATUS_LABELS[fields?.status ?? "0"];
-
   const deadlineMs = fields?.deadline ? Number(fields.deadline) : 0;
   const deadlineDate = deadlineMs > 0 ? new Date(deadlineMs).toLocaleString() : "None";
 
@@ -143,12 +141,8 @@ export default function PactDetail() {
               </div>
             )}
 
-            {error && (
-              <p className="text-sm text-[#EF4444] bg-[#EF444410] px-4 py-3 rounded-lg">{error}</p>
-            )}
-            {success && (
-              <p className="text-sm text-[#10B981] bg-[#10B98110] px-4 py-3 rounded-lg">{success}</p>
-            )}
+            {error && <p className="text-sm text-[#EF4444] bg-[#EF444410] px-4 py-3 rounded-lg">{error}</p>}
+            {success && <p className="text-sm text-[#10B981] bg-[#10B98110] px-4 py-3 rounded-lg">{success}</p>}
 
             {isPending2 && (
               <div className="flex gap-3">

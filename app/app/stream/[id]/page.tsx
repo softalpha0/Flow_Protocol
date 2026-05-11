@@ -18,20 +18,27 @@ export default function StreamDetail() {
 
   const { data, isLoading, refetch } = useSuiClientQuery("getObject", {
     id,
-    options: { showContent: true },
+    options: { showContent: true, showType: true },
   });
 
-  const fields = (data?.data?.content as { fields?: Record<string, string> })?.fields;
+  const content = data?.data?.content as { fields?: Record<string, string>; type?: string } | undefined;
+  const fields = content?.fields;
+  const objectType = content?.type ?? data?.data?.type ?? "";
+  const coinType = objectType.match(/<(.+)>/)?.[1] ?? "";
 
   useEffect(() => {
     if (!fields) return;
-    if (fields.is_active !== "true" && fields.is_active !== true) return;
+    if (fields.is_active !== true && fields.is_active !== "true") return;
 
     const interval = setInterval(() => {
       const now = BigInt(Date.now());
       const lastWithdrawn = BigInt(fields.last_withdrawn);
       const rate = BigInt(fields.rate_per_second);
-      const balance = BigInt(fields.balance);
+      const balance = BigInt(
+        typeof fields.balance === "object"
+          ? (fields.balance as unknown as { fields: { value: string } }).fields.value
+          : fields.balance
+      );
       const elapsedMs = now - lastWithdrawn;
       const elapsedSec = elapsedMs / 1000n;
       const earned = elapsedSec * rate;
@@ -42,56 +49,40 @@ export default function StreamDetail() {
   }, [fields]);
 
   function handleWithdraw() {
-    if (!account || !fields) return;
-    setError("");
-    setSuccess("");
+    if (!account || !coinType) return;
+    setError(""); setSuccess("");
 
     const tx = new Transaction();
-    const [coin] = tx.splitCoins(tx.gas, [claimable]);
-
     tx.moveCall({
       target: `${PACKAGE_ID}::stream::withdraw_stream`,
-      arguments: [
-        tx.object(id),
-        coin,
-        tx.object("0x6"),
-      ],
+      typeArguments: [coinType],
+      arguments: [tx.object(id), tx.object("0x6")],
     });
 
     signAndExecute(
       { transaction: tx },
       {
-        onSuccess: () => {
-          setSuccess("Withdrawal successful.");
-          refetch();
-        },
+        onSuccess: () => { setSuccess("Withdrawal successful."); refetch(); },
         onError: (err) => setError(err.message),
       }
     );
   }
 
   function handleCancel() {
-    if (!account) return;
-    setError("");
-    setSuccess("");
+    if (!account || !coinType) return;
+    setError(""); setSuccess("");
 
     const tx = new Transaction();
-
     tx.moveCall({
       target: `${PACKAGE_ID}::stream::cancel_stream`,
-      arguments: [
-        tx.object(id),
-        tx.object("0x6"),
-      ],
+      typeArguments: [coinType],
+      arguments: [tx.object(id), tx.object("0x6")],
     });
 
     signAndExecute(
       { transaction: tx },
       {
-        onSuccess: () => {
-          setSuccess("Stream cancelled.");
-          refetch();
-        },
+        onSuccess: () => { setSuccess("Stream cancelled."); refetch(); },
         onError: (err) => setError(err.message),
       }
     );
@@ -100,6 +91,12 @@ export default function StreamDetail() {
   const isSender = account?.address === fields?.sender;
   const isRecipient = account?.address === fields?.recipient;
   const isActive = fields?.is_active === true || fields?.is_active === "true";
+
+  const balanceRaw = fields?.balance
+    ? typeof fields.balance === "object"
+      ? (fields.balance as unknown as { fields: { value: string } }).fields.value
+      : fields.balance
+    : "0";
 
   return (
     <main className="min-h-screen bg-[#08080F]">
@@ -129,37 +126,31 @@ export default function StreamDetail() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">Rate</span>
-                <span>{mistToSui(BigInt(fields.rate_per_second))} SUI / sec</span>
+                <span>{mistToSui(BigInt(fields.rate_per_second))} / sec</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">Remaining balance</span>
-                <span>{mistToSui(BigInt(fields.balance))} SUI</span>
+                <span className="text-[#6B7280]">Remaining</span>
+                <span>{mistToSui(BigInt(balanceRaw))}</span>
               </div>
             </div>
 
             {isActive && (
               <div className="p-6 rounded-xl border border-[#7C3AED40] bg-[#1E1040] text-center">
                 <p className="text-xs text-[#A78BFA] mb-1 uppercase tracking-wide">Claimable now</p>
-                <p className="text-4xl font-bold font-mono text-white">
-                  {mistToSui(claimable)} SUI
-                </p>
+                <p className="text-4xl font-bold font-mono">{mistToSui(claimable)}</p>
                 <p className="text-xs text-[#6B7280] mt-1">Updates every second</p>
               </div>
             )}
 
-            {error && (
-              <p className="text-sm text-[#EF4444] bg-[#EF444410] px-4 py-3 rounded-lg">{error}</p>
-            )}
-            {success && (
-              <p className="text-sm text-[#10B981] bg-[#10B98110] px-4 py-3 rounded-lg">{success}</p>
-            )}
+            {error && <p className="text-sm text-[#EF4444] bg-[#EF444410] px-4 py-3 rounded-lg">{error}</p>}
+            {success && <p className="text-sm text-[#10B981] bg-[#10B98110] px-4 py-3 rounded-lg">{success}</p>}
 
             <div className="flex gap-3">
               {isRecipient && isActive && (
                 <button
                   onClick={handleWithdraw}
                   disabled={isPending || claimable === 0n}
-                  className="flex-1 py-3 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors"
+                  className="flex-1 py-3 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-50 font-medium text-sm transition-colors"
                 >
                   {isPending ? "Processing..." : "Withdraw"}
                 </button>
@@ -168,7 +159,7 @@ export default function StreamDetail() {
                 <button
                   onClick={handleCancel}
                   disabled={isPending}
-                  className="flex-1 py-3 rounded-lg border border-[#EF4444] text-[#EF4444] hover:bg-[#EF444410] disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors"
+                  className="flex-1 py-3 rounded-lg border border-[#EF4444] text-[#EF4444] hover:bg-[#EF444410] disabled:opacity-50 font-medium text-sm transition-colors"
                 >
                   {isPending ? "Processing..." : "Cancel Stream"}
                 </button>
