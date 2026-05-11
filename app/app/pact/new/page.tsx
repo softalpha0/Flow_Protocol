@@ -46,15 +46,22 @@ export default function NewPact() {
       });
 
       signAndExecute(
-        { transaction: tx },
+        {
+          transaction: tx,
+          options: { showEffects: true, showObjectChanges: true },
+        },
         {
           onSuccess: (result) => {
-            console.log("Pact created:", result);
-            router.push("/app");
+            const created = result.objectChanges?.find(
+              (c) => c.type === "created" && c.objectType?.includes("::pact::Pact")
+            );
+            if (created && "objectId" in created) {
+              router.push(`/app/pact/${created.objectId}`);
+            } else {
+              router.push("/app");
+            }
           },
-          onError: (err) => {
-            setError(err.message);
-          },
+          onError: (err) => setError(err.message),
         }
       );
     } catch (err: unknown) {
