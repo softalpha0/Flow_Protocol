@@ -1,23 +1,20 @@
 "use client";
 
-import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
+import { SuiClientProvider, WalletProvider, createNetworkConfig } from "@mysten/dapp-kit";
 import { NETWORK } from "@/constants";
-
-import "@mysten/dapp-kit/dist/index.css";
 
 const queryClient = new QueryClient();
 
-const networks = {
+const { networkConfig } = createNetworkConfig({
   testnet: { url: "https://rpc-testnet.suiscan.xyz" },
-  mainnet: { url: "https://rpc.mainnet.sui.io" },
-};
+  mainnet: { url: "https://fullnode.mainnet.sui.io" },
+});
 
-export default function Providers({ children }: { children: ReactNode }) {
+export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networks} defaultNetwork={NETWORK}>
+      <SuiClientProvider networks={networkConfig} defaultNetwork={NETWORK}>
         <WalletProvider autoConnect>
           {children}
         </WalletProvider>
