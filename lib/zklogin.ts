@@ -20,9 +20,6 @@ type SuiClientLike = {
 export const GOOGLE_CLIENT_ID =
   "655215891225-fs095usti8j8sgc1tcidcpla313dbb4t.apps.googleusercontent.com";
 
-const SALT_SERVICE = "https://salt.api.mystenlabs.com/get_salt";
-const PROVER_URL = "https://prover-dev.mystenlabs.com/v1";
-
 export interface ZkLoginSession {
   address: string;
   jwt: string;
@@ -64,7 +61,7 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
   const ephemeralKeyStr = sessionStorage.getItem("zkl_key") ?? "";
   const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyStr);
 
-  const saltRes = await fetch(SALT_SERVICE, {
+  const saltRes = await fetch("/api/zklogin/salt", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token: jwt }),
@@ -73,7 +70,7 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
 
   const address = jwtToAddress(jwt, salt, false);
 
-  const proofRes = await fetch(PROVER_URL, {
+  const proofRes = await fetch("/api/zklogin/proof", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
