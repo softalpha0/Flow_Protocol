@@ -2,7 +2,8 @@ const WALRUS_PUBLISHER = "https://publisher.walrus-testnet.walrus.space/v1/blobs
 const WALRUS_AGGREGATOR = "https://aggregator.walrus-testnet.walrus.space/v1/blobs";
 
 export async function uploadToWalrus(content: string | Uint8Array): Promise<string> {
-  const body = typeof content === "string" ? new TextEncoder().encode(content) : content;
+  const bytes = typeof content === "string" ? new TextEncoder().encode(content) : content;
+  const body: ArrayBuffer = bytes.buffer as ArrayBuffer;
 
   const res = await fetch(WALRUS_PUBLISHER, {
     method: "PUT",
