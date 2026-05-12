@@ -85,14 +85,7 @@ export default function NewPact() {
         { transaction: tx },
         {
           onSuccess: () => {
-            const created = result.objectChanges?.find(
-              (c) => c.type === "created" && c.objectType?.includes("::pact::Pact")
-            );
-            if (created && "objectId" in created) {
-              router.push(`/app/pact/${created.objectId}`);
-            } else {
-              router.push("/app");
-            }
+            router.push("/app");
           },
           onError: (err) => setError(err.message),
         }
