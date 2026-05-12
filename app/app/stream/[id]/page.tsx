@@ -90,7 +90,7 @@ export default function StreamDetail() {
 
   const isSender = account?.address === fields?.sender;
   const isRecipient = account?.address === fields?.recipient;
-  const isActive = fields?.is_active === true || fields?.is_active === "true";
+  const isActive = fields?.is_active === "true";
 
   const balanceRaw = fields?.balance
     ? typeof fields.balance === "object"
