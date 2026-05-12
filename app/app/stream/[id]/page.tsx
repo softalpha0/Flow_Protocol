@@ -28,7 +28,7 @@ export default function StreamDetail() {
 
   useEffect(() => {
     if (!fields) return;
-    if (fields.is_active !== true && fields.is_active !== "true") return;
+    if (fields.is_active !== "true") return;
 
     const interval = setInterval(() => {
       const now = BigInt(Date.now());
