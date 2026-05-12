@@ -72,7 +72,7 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
   });
   const { salt } = await saltRes.json() as { salt: string };
 
-  const address = jwtToAddress(jwt, salt);
+  const address = jwtToAddress(jwt, salt, "sub");
 
   const proofRes = await fetch(PROVER_URL, {
     method: "POST",
