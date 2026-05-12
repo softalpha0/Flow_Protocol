@@ -48,18 +48,9 @@ export default function NewStream() {
       });
 
       signAndExecute(
-        { transaction: tx, options: { showObjectChanges: true } },
+        { transaction: tx },
         {
-          onSuccess: (result) => {
-            const created = result.objectChanges?.find(
-              (c) => c.type === "created" && c.objectType?.includes("::stream::Stream")
-            );
-            if (created && "objectId" in created) {
-              router.push(`/app/stream/${created.objectId}`);
-            } else {
-              router.push("/app");
-            }
-          },
+          onSuccess: () => { router.push("/app"); },
           onError: (err) => setError(err.message),
         }
       );
