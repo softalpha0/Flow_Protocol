@@ -29,7 +29,7 @@ export interface ZkLoginSession {
   salt: string;
   maxEpoch: number;
   randomness: string;
-  ephemeralKey: number[];
+  ephemeralKeyStr: string;
   addressSeed: string;
   proofPoints: { a: string[]; b: string[][]; c: string[] };
   issBase64Details: { value: string; indexMod4: number };
@@ -43,7 +43,7 @@ export async function beginZkLogin(suiClient: SuiClientLike) {
   const randomness = generateRandomness();
   const nonce = generateNonce(keypair.getPublicKey(), maxEpoch, randomness);
 
-  sessionStorage.setItem("zkl_key", JSON.stringify(Array.from(keypair.getSecretKey())));
+  sessionStorage.setItem("zkl_key", keypair.getSecretKey());
   sessionStorage.setItem("zkl_epoch", String(maxEpoch));
   sessionStorage.setItem("zkl_rand", randomness);
 
@@ -61,8 +61,8 @@ export async function beginZkLogin(suiClient: SuiClientLike) {
 export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Promise<ZkLoginSession> {
   const maxEpoch = Number(sessionStorage.getItem("zkl_epoch") ?? "0");
   const randomness = sessionStorage.getItem("zkl_rand") ?? "";
-  const keyBytes = new Uint8Array(JSON.parse(sessionStorage.getItem("zkl_key") ?? "[]"));
-  const keypair = Ed25519Keypair.fromSecretKey(keyBytes);
+  const ephemeralKeyStr = sessionStorage.getItem("zkl_key") ?? "";
+  const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyStr);
 
   const saltRes = await fetch(SALT_SERVICE, {
     method: "POST",
@@ -98,7 +98,7 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
     salt,
     maxEpoch,
     randomness,
-    ephemeralKey: Array.from(keyBytes),
+    ephemeralKeyStr,
     addressSeed: proof.addressSeed,
     proofPoints: proof.proofPoints,
     issBase64Details: proof.issBase64Details,
@@ -126,7 +126,7 @@ export function clearZkLoginSession() {
 }
 
 export async function zkExecuteTransaction(tx: Transaction, session: ZkLoginSession, suiClient: SuiClientLike) {
-  const keypair = Ed25519Keypair.fromSecretKey(new Uint8Array(session.ephemeralKey));
+  const keypair = Ed25519Keypair.fromSecretKey(session.ephemeralKeyStr);
   const txBytes = await tx.build({ client: suiClient as never });
   const { signature: ephem } = await keypair.signTransaction(txBytes);
 
