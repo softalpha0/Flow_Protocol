@@ -82,7 +82,7 @@ export default function NewPact() {
       });
 
       signAndExecute(
-        { transaction: tx, options: { showObjectChanges: true } },
+        { transaction: tx },
         {
           onSuccess: (result) => {
             const created = result.objectChanges?.find(
