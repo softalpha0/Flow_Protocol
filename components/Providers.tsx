@@ -7,8 +7,8 @@ import { NETWORK } from "@/constants";
 const queryClient = new QueryClient();
 
 const { networkConfig } = createNetworkConfig({
-  testnet: { url: "https://rpc-testnet.suiscan.xyz" },
-  mainnet: { url: "https://fullnode.mainnet.sui.io" },
+  testnet: { url: "https://rpc-testnet.suiscan.xyz", network: "testnet" as const },
+  mainnet: { url: "https://fullnode.mainnet.sui.io", network: "mainnet" as const },
 });
 
 export default function Providers({ children }: { children: React.ReactNode }) {
