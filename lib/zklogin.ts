@@ -5,9 +5,8 @@ import {
   jwtToAddress,
   getExtendedEphemeralPublicKey,
   getZkLoginSignature,
-  computeZkLoginAddressSeed,
 } from "@mysten/sui/zklogin";
-import { toB64 } from "@mysten/sui/utils";
+import { toBase64 } from "@mysten/sui/utils";
 
 export const GOOGLE_CLIENT_ID =
   "655215891225-fs095usti8j8sgc1tcidcpla313dbb4t.apps.googleusercontent.com";
@@ -22,6 +21,7 @@ export interface ZkLoginSession {
   maxEpoch: number;
   randomness: string;
   ephemeralKey: number[];
+  addressSeed: string;
   proofPoints: { a: string[]; b: string[][]; c: string[] };
   issBase64Details: { value: string; indexMod4: number };
   headerBase64: string;
@@ -83,6 +83,7 @@ export async function completeZkLogin(
     proofPoints: ZkLoginSession["proofPoints"];
     issBase64Details: ZkLoginSession["issBase64Details"];
     headerBase64: string;
+    addressSeed: string;
   };
 
   const session: ZkLoginSession = {
@@ -92,6 +93,7 @@ export async function completeZkLogin(
     maxEpoch,
     randomness,
     ephemeralKey: Array.from(keyBytes),
+    addressSeed: proof.addressSeed,
     proofPoints: proof.proofPoints,
     issBase64Details: proof.issBase64Details,
     headerBase64: proof.headerBase64,
@@ -132,29 +134,15 @@ export async function zkExecuteTransaction(
   const txBytes = await tx.build({ client: suiClient });
   const { signature: ephem } = await keypair.signTransaction(txBytes);
 
-  const [, payloadB64] = session.jwt.split(".");
-  const payload = JSON.parse(
-    atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/"))
-  ) as { sub: string; iss: string; aud: string | string[] };
-
-  const aud = Array.isArray(payload.aud) ? payload.aud[0] : payload.aud;
-
-  const addressSeed = computeZkLoginAddressSeed(
-    BigInt(session.salt),
-    "sub",
-    payload.sub,
-    aud
-  ).toString();
-
   const zkSig = getZkLoginSignature({
     inputs: {
       proofPoints: session.proofPoints,
       issBase64Details: session.issBase64Details,
       headerBase64: session.headerBase64,
-      addressSeed,
+      addressSeed: session.addressSeed,
     },
     maxEpoch: session.maxEpoch,
-    userSignature: toB64(ephem),
+    userSignature: toBase64(ephem),
   });
 
   return suiClient.executeTransactionBlock({
