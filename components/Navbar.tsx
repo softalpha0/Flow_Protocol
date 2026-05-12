@@ -23,6 +23,9 @@ export default function Navbar() {
           <Link href="/app/send" className="text-sm text-[#6B7280] hover:text-white transition-colors">
             Send
           </Link>
+          <Link href="/sdk" className="text-sm text-[#6B7280] hover:text-white transition-colors">
+            SDK
+          </Link>
           <ConnectButton />
         </div>
       </div>

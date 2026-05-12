@@ -1,12 +1,13 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClientQuery } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import Navbar from "@/components/Navbar";
 import { PACKAGE_ID } from "@/constants";
 import { mistToSui, shortenAddress } from "@/lib/sui";
+import { fetchTextFromWalrus, uploadToWalrus, walrusBlobUrl } from "@/lib/walrus";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   "0": { label: "Pending", color: "text-[#F59E0B] bg-[#F59E0B20]" },
@@ -26,6 +27,9 @@ export default function PactDetail() {
   const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [walrusContent, setWalrusContent] = useState<string | null>(null);
+  const [walrusLoading, setWalrusLoading] = useState(false);
+  const [receiptBlobId, setReceiptBlobId] = useState<string | null>(null);
 
   const { data, isLoading, refetch } = useSuiClientQuery("getObject", {
     id,
@@ -36,6 +40,38 @@ export default function PactDetail() {
   const coinType = extractCoinType(objectType);
   const content = data?.data?.content as { fields?: Record<string, string> } | undefined;
   const fields = content?.fields;
+  const walrusBlobId: string = fields?.walrus_blob_id ?? "";
+
+  useEffect(() => {
+    if (!walrusBlobId) return;
+    setWalrusLoading(true);
+    fetchTextFromWalrus(walrusBlobId)
+      .then((text) => setWalrusContent(text))
+      .catch(() => setWalrusContent(null))
+      .finally(() => setWalrusLoading(false));
+  }, [walrusBlobId]);
+
+  async function generateAndUploadReceipt() {
+    if (!fields) return;
+    try {
+      const receipt = JSON.stringify({
+        protocol: "Flow Protocol",
+        type: "PactReceipt",
+        pactId: id,
+        sender: fields.sender,
+        recipient: fields.recipient,
+        amount: `${mistToSui(BigInt(fields.amount))} SUI`,
+        description: fields.description,
+        completedAt: new Date().toISOString(),
+        network: "Sui Testnet",
+        packageId: PACKAGE_ID,
+      }, null, 2);
+      const blobId = await uploadToWalrus(receipt);
+      setReceiptBlobId(blobId);
+    } catch {
+      // receipt upload is best-effort, don't surface as error
+    }
+  }
 
   function handleComplete() {
     if (!account) return;
@@ -49,7 +85,11 @@ export default function PactDetail() {
     signAndExecute(
       { transaction: tx },
       {
-        onSuccess: () => { setSuccess("Pact completed. Funds released."); refetch(); },
+        onSuccess: () => {
+          setSuccess("Pact completed. Funds released.");
+          refetch();
+          generateAndUploadReceipt();
+        },
         onError: (err) => setError(err.message),
       }
     );
@@ -93,8 +133,8 @@ export default function PactDetail() {
 
   const isSender = account?.address?.toLowerCase() === fields?.sender?.toLowerCase();
   const isRecipient = account?.address?.toLowerCase() === fields?.recipient?.toLowerCase();
-  const isPending2 = fields?.status === "0" || fields?.status === 0 || String(fields?.status) === "0";
-  const statusInfo = STATUS_LABELS[fields?.status ?? "0"];
+  const isPending2 = String(fields?.status) === "0";
+  const statusInfo = STATUS_LABELS[String(fields?.status ?? "0")];
   const deadlineMs = fields?.deadline ? Number(fields.deadline) : 0;
   const deadlineDate = deadlineMs > 0 ? new Date(deadlineMs).toLocaleString() : "None";
 
@@ -136,8 +176,60 @@ export default function PactDetail() {
 
             {fields.description && (
               <div className="p-4 rounded-xl border border-[#1A1A2E] bg-[#0F0F1A]">
-                <p className="text-xs text-[#6B7280] mb-1 uppercase tracking-wide">Terms</p>
+                <p className="text-xs text-[#6B7280] mb-1 uppercase tracking-wide">Summary</p>
                 <p className="text-sm">{fields.description}</p>
+              </div>
+            )}
+
+            {walrusBlobId && (
+              <div className="p-4 rounded-xl border border-[#7C3AED]/30 bg-[#7C3AED]/5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <p className="text-xs font-semibold text-white">Terms Document</p>
+                    <span className="text-xs text-[#6B7280]">— stored on Walrus</span>
+                  </div>
+                  <a
+                    href={walrusBlobUrl(walrusBlobId)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#7C3AED] hover:underline"
+                  >
+                    Open raw
+                  </a>
+                </div>
+                {walrusLoading && <p className="text-xs text-[#6B7280]">Fetching from Walrus...</p>}
+                {walrusContent && !walrusLoading && (
+                  <pre className="text-xs text-[#A1A1AA] whitespace-pre-wrap break-words max-h-48 overflow-y-auto leading-relaxed">
+                    {walrusContent}
+                  </pre>
+                )}
+                <p className="text-xs text-[#374151] font-mono mt-2 break-all">blob: {walrusBlobId}</p>
+              </div>
+            )}
+
+            {receiptBlobId && (
+              <div className="p-4 rounded-xl border border-[#10B981]/30 bg-[#10B981]/5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <p className="text-xs font-semibold text-white">Completion Receipt</p>
+                    <span className="text-xs text-[#6B7280]">— saved to Walrus</span>
+                  </div>
+                  <a
+                    href={walrusBlobUrl(receiptBlobId)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#10B981] hover:underline"
+                  >
+                    View receipt
+                  </a>
+                </div>
               </div>
             )}
 
