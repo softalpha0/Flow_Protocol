@@ -1,0 +1,17 @@
+{
+  "name": "@flow-protocol/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for Flow Protocol — stream, escrow, and split any asset on Sui",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@mysten/sui": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
