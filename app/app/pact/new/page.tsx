@@ -84,7 +84,7 @@ export default function NewPact() {
       signAndExecute(
         { transaction: tx },
         {
-          onSuccess: (result) => {
+          onSuccess: () => {
             const created = result.objectChanges?.find(
               (c) => c.type === "created" && c.objectType?.includes("::pact::Pact")
             );
