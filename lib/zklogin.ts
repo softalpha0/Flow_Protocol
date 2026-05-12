@@ -6,7 +6,6 @@ import {
   getExtendedEphemeralPublicKey,
   getZkLoginSignature,
 } from "@mysten/sui/zklogin";
-import { toBase64 } from "@mysten/sui/utils";
 import { Transaction } from "@mysten/sui/transactions";
 
 type SuiClientLike = {
@@ -139,7 +138,7 @@ export async function zkExecuteTransaction(tx: Transaction, session: ZkLoginSess
       addressSeed: session.addressSeed,
     },
     maxEpoch: session.maxEpoch,
-    userSignature: toBase64(ephem),
+    userSignature: ephem,
   });
 
   return suiClient.executeTransactionBlock({
