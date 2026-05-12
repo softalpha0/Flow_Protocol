@@ -8,7 +8,15 @@ import {
 } from "@mysten/sui/zklogin";
 import { toBase64 } from "@mysten/sui/utils";
 import { Transaction } from "@mysten/sui/transactions";
-import type { SuiClient } from "@mysten/sui/client";
+
+type SuiClientLike = {
+  getLatestSuiSystemState(): Promise<{ epoch: string | bigint }>;
+  executeTransactionBlock(args: {
+    transactionBlock: Uint8Array;
+    signature: string;
+    options?: Record<string, boolean>;
+  }): Promise<unknown>;
+};
 
 export const GOOGLE_CLIENT_ID =
   "655215891225-fs095usti8j8sgc1tcidcpla313dbb4t.apps.googleusercontent.com";
@@ -29,7 +37,7 @@ export interface ZkLoginSession {
   headerBase64: string;
 }
 
-export async function beginZkLogin(suiClient: SuiClient) {
+export async function beginZkLogin(suiClient: SuiClientLike) {
   const keypair = new Ed25519Keypair();
   const { epoch } = await suiClient.getLatestSuiSystemState();
   const maxEpoch = Number(epoch) + 2;
@@ -51,7 +59,7 @@ export async function beginZkLogin(suiClient: SuiClient) {
   window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 }
 
-export async function completeZkLogin(jwt: string, suiClient: SuiClient): Promise<ZkLoginSession> {
+export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Promise<ZkLoginSession> {
   const maxEpoch = Number(sessionStorage.getItem("zkl_epoch") ?? "0");
   const randomness = sessionStorage.getItem("zkl_rand") ?? "";
   const keyBytes = new Uint8Array(JSON.parse(sessionStorage.getItem("zkl_key") ?? "[]"));
@@ -118,9 +126,9 @@ export function clearZkLoginSession() {
   sessionStorage.removeItem("zkl_rand");
 }
 
-export async function zkExecuteTransaction(tx: Transaction, session: ZkLoginSession, suiClient: SuiClient) {
+export async function zkExecuteTransaction(tx: Transaction, session: ZkLoginSession, suiClient: SuiClientLike) {
   const keypair = Ed25519Keypair.fromSecretKey(new Uint8Array(session.ephemeralKey));
-  const txBytes = await tx.build({ client: suiClient });
+  const txBytes = await tx.build({ client: suiClient as never });
   const { signature: ephem } = await keypair.signTransaction(txBytes);
 
   const zkSig = getZkLoginSignature({

@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSuiClient } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
-import type { SuiClient } from "@mysten/sui/client";
 import { ZkLoginSession, loadZkLoginSession, clearZkLoginSession, zkExecuteTransaction } from "@/lib/zklogin";
 
 interface ZkLoginContextType {
@@ -22,7 +21,7 @@ const ZkLoginContext = createContext<ZkLoginContextType>({
 
 export function ZkLoginProvider({ children }: { children: React.ReactNode }) {
   const [session, setSessionState] = useState<ZkLoginSession | null>(null);
-  const suiClient = useSuiClient() as SuiClient;
+  const suiClient = useSuiClient();
 
   useEffect(() => {
     setSessionState(loadZkLoginSession());
