@@ -36,12 +36,12 @@ export default function AuthCallback() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#060B18] flex items-center justify-center">
+    <main className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
       <div className="text-center px-6">
         {error ? (
           <div>
             <p className="text-[#EF4444] mb-2 text-sm">{error}</p>
-            <button onClick={() => router.push("/")} className="text-sm text-[#6B7280] hover:text-white">
+            <button onClick={() => router.push("/")} className="text-sm text-[#6B7280] hover:text-[#111827]">
               Go back
             </button>
           </div>

@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#060B18] overflow-x-hidden">
+    <main className="min-h-screen bg-[#FFFFFF] overflow-x-hidden">
       <Navbar />
 
       <section className="max-w-6xl mx-auto px-6 pt-40 pb-24 text-center relative">
@@ -11,7 +11,7 @@ export default function Home() {
           <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#2563EB] opacity-10 rounded-full blur-[120px]" />
         </div>
         <div className="relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#0F1E3D] bg-[#0F0F1A] text-xs text-[#A78BFA] mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#A78BFA] mb-8">
             Live on Sui Testnet
           </div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
@@ -22,32 +22,32 @@ export default function Home() {
             Flow is a programmable payments protocol on Sui. Stream any asset by the second, lock funds in milestone escrow, or split payments across a team — all onchain, non-custodial, with any token.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link href="/app" className="px-6 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm transition-colors">
+            <Link href="/app" className="px-6 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-[#111827] font-medium text-sm transition-colors">
               Launch App
             </Link>
-            <Link href="/app/stream/new" className="px-6 py-3 rounded-lg border border-[#0F1E3D] hover:border-[#2563EB] text-white font-medium text-sm transition-colors">
+            <Link href="/app/stream/new" className="px-6 py-3 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#111827] font-medium text-sm transition-colors">
               Start Streaming
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-[#0F1E3D] bg-[#0F0F1A]">
+      <section className="border-y border-[#E2E8F0] bg-[#F8FAFC]">
         <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div>
-            <p className="text-3xl font-bold text-white mb-1">400ms</p>
+            <p className="text-3xl font-bold text-[#111827] mb-1">400ms</p>
             <p className="text-sm text-[#6B7280]">Settlement time</p>
           </div>
           <div>
-            <p className="text-3xl font-bold text-white mb-1">Any asset</p>
+            <p className="text-3xl font-bold text-[#111827] mb-1">Any asset</p>
             <p className="text-sm text-[#6B7280]">SUI, USDC, USDT and more</p>
           </div>
           <div>
-            <p className="text-3xl font-bold text-white mb-1">Non-custodial</p>
+            <p className="text-3xl font-bold text-[#111827] mb-1">Non-custodial</p>
             <p className="text-sm text-[#6B7280]">You control your funds</p>
           </div>
           <div>
-            <p className="text-3xl font-bold text-white mb-1">3 primitives</p>
+            <p className="text-3xl font-bold text-[#111827] mb-1">3 primitives</p>
             <p className="text-sm text-[#6B7280]">Stream, Pact, Instant</p>
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function Home() {
           <h2 className="text-3xl md:text-4xl font-bold">Three ways to move money</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="p-8 rounded-2xl border border-[#0F1E3D] bg-[#0F0F1A] hover:border-[#2563EB40] transition-colors">
+          <div className="p-8 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB40] transition-colors">
             <div className="w-12 h-12 rounded-xl bg-[#1E1040] flex items-center justify-center mb-6">
               <span className="text-[#A78BFA] text-xl font-bold">S</span>
             </div>
@@ -83,7 +83,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="p-8 rounded-2xl border border-[#2563EB40] bg-[#0F0F1A] relative">
+          <div className="p-8 rounded-2xl border border-[#2563EB40] bg-[#F8FAFC] relative">
             <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-[#2563EB20] text-[#A78BFA] text-xs">Popular</div>
             <div className="w-12 h-12 rounded-xl bg-[#1E1040] flex items-center justify-center mb-6">
               <span className="text-[#A78BFA] text-xl font-bold">P</span>
@@ -108,7 +108,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="p-8 rounded-2xl border border-[#0F1E3D] bg-[#0F0F1A] hover:border-[#2563EB40] transition-colors">
+          <div className="p-8 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB40] transition-colors">
             <div className="w-12 h-12 rounded-xl bg-[#1E1040] flex items-center justify-center mb-6">
               <span className="text-[#A78BFA] text-xl font-bold">I</span>
             </div>
@@ -134,26 +134,26 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#0F0F1A] border-y border-[#0F1E3D]">
+      <section className="bg-[#F8FAFC] border-y border-[#E2E8F0]">
         <div className="max-w-6xl mx-auto px-6 py-24">
           <div className="text-center mb-16">
             <p className="text-xs text-[#A78BFA] uppercase tracking-widest mb-3">Use Cases</p>
             <h2 className="text-3xl md:text-4xl font-bold">Built for how work happens now</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#060B18]">
+            <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF]">
               <p className="text-sm font-semibold text-[#A78BFA] mb-2">Remote teams</p>
               <p className="text-sm text-[#6B7280] leading-relaxed">Stream salaries by the second to contributors anywhere in the world. No bank accounts, no wire transfers, no delays.</p>
             </div>
-            <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#060B18]">
+            <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF]">
               <p className="text-sm font-semibold text-[#A78BFA] mb-2">Freelance work</p>
               <p className="text-sm text-[#6B7280] leading-relaxed">Create a Pact with clear milestone terms. Clients lock funds upfront, freelancers deliver, payment releases instantly — no chasing invoices.</p>
             </div>
-            <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#060B18]">
+            <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF]">
               <p className="text-sm font-semibold text-[#A78BFA] mb-2">DAO payroll</p>
               <p className="text-sm text-[#6B7280] leading-relaxed">Split contributor payments across a whole team in one transaction. Pay in USDC, USDT, or any token your DAO holds.</p>
             </div>
-            <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#060B18]">
+            <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF]">
               <p className="text-sm font-semibold text-[#A78BFA] mb-2">Onchain subscriptions</p>
               <p className="text-sm text-[#6B7280] leading-relaxed">Replace recurring payment infrastructure with a Stream. Subscribers deposit once, and the service provider earns continuously.</p>
             </div>
@@ -184,25 +184,25 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="p-6 rounded-2xl border border-[#0F1E3D] bg-[#0F0F1A] font-mono text-sm overflow-x-auto">
+          <div className="p-6 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] font-mono text-sm overflow-x-auto">
             <p className="text-[#6B7280] mb-1">// Stream USDC to a contributor</p>
-            <p className="text-[#A78BFA]">import <span className="text-white">{"{ FlowClient }"}</span> from <span className="text-[#10B981]">"@flow-protocol/sdk"</span>;</p>
+            <p className="text-[#A78BFA]">import <span className="text-[#111827]">{"{ FlowClient }"}</span> from <span className="text-[#10B981]">"@flow-protocol/sdk"</span>;</p>
             <br />
-            <p className="text-[#A78BFA]">const <span className="text-white">flow</span> = new <span className="text-[#A78BFA]">FlowClient</span>{"({ network: "}<span className="text-[#10B981]">"mainnet"</span>{" })"}</p>
+            <p className="text-[#A78BFA]">const <span className="text-[#111827]">flow</span> = new <span className="text-[#A78BFA]">FlowClient</span>{"({ network: "}<span className="text-[#10B981]">"mainnet"</span>{" })"}</p>
             <br />
-            <p className="text-[#A78BFA]">const <span className="text-white">tx</span> = flow.stream.<span className="text-[#10B981]">createStream</span>{"({"}</p>
-            <p className="text-white pl-4">recipient: <span className="text-[#10B981]">"0x..."</span>,</p>
-            <p className="text-white pl-4">ratePerSecond: <span className="text-[#F59E0B]">1000n</span>,</p>
-            <p className="text-white pl-4">deposit: <span className="text-[#F59E0B]">2_592_000_000n</span>,</p>
-            <p className="text-white pl-4">coinType: COIN_TYPES.<span className="text-[#10B981]">USDC</span>,</p>
-            <p className="text-white pl-4">coinObjectId: <span className="text-[#10B981]">"0x..."</span>,</p>
+            <p className="text-[#A78BFA]">const <span className="text-[#111827]">tx</span> = flow.stream.<span className="text-[#10B981]">createStream</span>{"({"}</p>
+            <p className="text-[#111827] pl-4">recipient: <span className="text-[#10B981]">"0x..."</span>,</p>
+            <p className="text-[#111827] pl-4">ratePerSecond: <span className="text-[#F59E0B]">1000n</span>,</p>
+            <p className="text-[#111827] pl-4">deposit: <span className="text-[#F59E0B]">2_592_000_000n</span>,</p>
+            <p className="text-[#111827] pl-4">coinType: COIN_TYPES.<span className="text-[#10B981]">USDC</span>,</p>
+            <p className="text-[#111827] pl-4">coinObjectId: <span className="text-[#10B981]">"0x..."</span>,</p>
             <p className="text-[#A78BFA]">{"});"}</p>
           </div>
         </div>
       </section>
 
       <section className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="p-12 rounded-2xl border border-[#0F1E3D] bg-[#0F0F1A] text-center relative overflow-hidden">
+        <div className="p-12 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] text-center relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#2563EB] opacity-10 rounded-full blur-[80px]" />
           </div>
@@ -212,10 +212,10 @@ export default function Home() {
               Flow is live on Sui testnet. Try streaming, creating a pact, or integrating the SDK into your app today.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
-              <Link href="/app" className="px-6 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm transition-colors">
+              <Link href="/app" className="px-6 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-[#111827] font-medium text-sm transition-colors">
                 Open App
               </Link>
-              <a href="https://github.com/softalpha0/Flow_Protocol" target="_blank" rel="noopener noreferrer" className="px-6 py-3 rounded-lg border border-[#0F1E3D] hover:border-[#2563EB] text-white font-medium text-sm transition-colors">
+              <a href="https://github.com/softalpha0/Flow_Protocol" target="_blank" rel="noopener noreferrer" className="px-6 py-3 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#111827] font-medium text-sm transition-colors">
                 View on GitHub
               </a>
             </div>
@@ -223,7 +223,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-[#0F1E3D]">
+      <footer className="border-t border-[#E2E8F0]">
         <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
           <p className="text-sm font-bold">flow<span className="text-[#2563EB]">.</span></p>
           <p className="text-xs text-[#6B7280]">Built on Sui</p>

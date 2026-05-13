@@ -97,7 +97,7 @@ export default function NewPact() {
 
   if (!account) {
     return (
-      <main className="min-h-screen bg-[#060B18]">
+      <main className="min-h-screen bg-[#FFFFFF]">
         <Navbar />
         <div className="max-w-6xl mx-auto px-6 pt-40 text-center">
           <p className="text-[#6B7280]">Connect your wallet first.</p>
@@ -107,7 +107,7 @@ export default function NewPact() {
   }
 
   return (
-    <main className="min-h-screen bg-[#060B18]">
+    <main className="min-h-screen bg-[#FFFFFF]">
       <Navbar />
       <div className="max-w-lg mx-auto px-6 pt-28 pb-16">
         <h1 className="text-2xl font-bold mb-2">Create Pact</h1>
@@ -123,8 +123,8 @@ export default function NewPact() {
                   onClick={() => setCoinType(opt.value)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     coinType === opt.value
-                      ? "bg-[#2563EB] text-white"
-                      : "bg-[#0F0F1A] border border-[#0F1E3D] text-[#6B7280] hover:text-white"
+                      ? "bg-[#2563EB] text-[#111827]"
+                      : "bg-[#F8FAFC] border border-[#E2E8F0] text-[#6B7280] hover:text-[#111827]"
                   }`}
                 >
                   {opt.label}
@@ -140,7 +140,7 @@ export default function NewPact() {
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
               placeholder="0x..."
-              className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] font-mono"
+              className="w-full px-4 py-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB] font-mono"
             />
           </div>
 
@@ -151,18 +151,18 @@ export default function NewPact() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="One-line description of the milestone..."
               rows={2}
-              className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] resize-none"
+              className="w-full px-4 py-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB] resize-none"
             />
           </div>
 
-          <div className="p-4 rounded-xl border border-[#0F1E3D] bg-[#080E1E] space-y-3">
+          <div className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-3">
             <div className="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
-              <p className="text-xs font-semibold text-white">Attach Terms to Walrus <span className="text-[#6B7280] font-normal">(optional)</span></p>
+              <p className="text-xs font-semibold text-[#111827]">Attach Terms to Walrus <span className="text-[#6B7280] font-normal">(optional)</span></p>
             </div>
             <p className="text-xs text-[#6B7280]">Upload a file or write extended terms. Stored permanently on Walrus decentralised storage — the blob ID is saved on-chain with this pact.</p>
 
@@ -171,7 +171,7 @@ export default function NewPact() {
               className={`w-full px-4 py-3 rounded-lg border border-dashed text-sm text-center cursor-pointer transition-colors ${
                 attachedFile
                   ? "border-[#2563EB] text-[#2563EB] bg-[#2563EB]/5"
-                  : "border-[#0F1E3D] text-[#6B7280] hover:border-[#374151] hover:text-white"
+                  : "border-[#E2E8F0] text-[#6B7280] hover:border-[#374151] hover:text-[#111827]"
               }`}
             >
               {attachedFile ? attachedFile.name : "Click to upload a file"}
@@ -186,7 +186,7 @@ export default function NewPact() {
                   onChange={(e) => setExtendedTerms(e.target.value)}
                   placeholder="Full deliverables, acceptance criteria, revision policy..."
                   rows={4}
-                  className="w-full px-4 py-3 rounded-lg bg-[#060B18] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] resize-none"
+                  className="w-full px-4 py-3 rounded-lg bg-[#FFFFFF] border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB] resize-none"
                 />
               </>
             )}
@@ -211,7 +211,7 @@ export default function NewPact() {
                 placeholder="5.0"
                 step="0.01"
                 min="0"
-                className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] pr-16"
+                className="w-full px-4 py-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB] pr-16"
               />
               <span className="absolute right-4 top-3 text-sm text-[#6B7280]">
                 {COIN_OPTIONS.find((o) => o.value === coinType)?.label}
@@ -225,7 +225,7 @@ export default function NewPact() {
               type="datetime-local"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB]"
+              className="w-full px-4 py-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB]"
             />
           </div>
 

@@ -40,7 +40,7 @@ export default function Dashboard() {
 
   if (!account) {
     return (
-      <main className="min-h-screen bg-[#060B18]">
+      <main className="min-h-screen bg-[#FFFFFF]">
         <Navbar />
         <div className="max-w-6xl mx-auto px-6 pt-40 text-center">
           <h2 className="text-2xl font-semibold mb-3">Connect your wallet</h2>
@@ -61,7 +61,7 @@ export default function Dashboard() {
   }) ?? [];
 
   return (
-    <main className="min-h-screen bg-[#060B18]">
+    <main className="min-h-screen bg-[#FFFFFF]">
       <Navbar />
       <div className="max-w-6xl mx-auto px-6 pt-28 pb-16">
         <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
@@ -69,7 +69,7 @@ export default function Dashboard() {
         <div className="grid md:grid-cols-3 gap-4 mb-10">
           <Link
             href="/app/stream/new"
-            className="p-6 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] hover:border-[#2563EB] transition-colors group"
+            className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group"
           >
             <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Stream</p>
             <p className="font-semibold group-hover:text-[#A78BFA] transition-colors">Create a payment stream</p>
@@ -77,7 +77,7 @@ export default function Dashboard() {
           </Link>
           <Link
             href="/app/pact/new"
-            className="p-6 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] hover:border-[#2563EB] transition-colors group"
+            className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group"
           >
             <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Pact</p>
             <p className="font-semibold group-hover:text-[#A78BFA] transition-colors">Create a pact</p>
@@ -85,7 +85,7 @@ export default function Dashboard() {
           </Link>
           <Link
             href="/app/send"
-            className="p-6 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] hover:border-[#2563EB] transition-colors group"
+            className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group"
           >
             <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Instant</p>
             <p className="font-semibold group-hover:text-[#A78BFA] transition-colors">Send or split</p>
@@ -105,7 +105,7 @@ export default function Dashboard() {
                   <Link
                     key={e.id.txDigest + e.id.eventSeq}
                     href={`/app/stream/${id}`}
-                    className="flex items-center justify-between p-4 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] hover:border-[#2563EB] transition-colors"
+                    className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors"
                   >
                     <div>
                       <p className="text-sm font-medium">
@@ -138,7 +138,7 @@ export default function Dashboard() {
                   <Link
                     key={e.id.txDigest + e.id.eventSeq}
                     href={`/app/pact/${id}`}
-                    className="flex items-center justify-between p-4 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] hover:border-[#2563EB] transition-colors"
+                    className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors"
                   >
                     <div>
                       <p className="text-sm font-medium">
@@ -160,12 +160,12 @@ export default function Dashboard() {
         )}
 
         {myStreams.length === 0 && myPacts.length === 0 && (
-          <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] text-center">
+          <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-center">
             <p className="text-sm text-[#6B7280]">No activity yet. Create a stream or pact to get started.</p>
           </div>
         )}
 
-        <div className="p-4 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] mt-4">
+        <div className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] mt-4">
           <p className="text-xs text-[#6B7280]">Connected as</p>
           <p className="font-mono text-xs mt-1 text-[#A78BFA] break-all">{account.address}</p>
         </div>

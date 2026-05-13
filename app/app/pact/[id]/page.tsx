@@ -139,7 +139,7 @@ export default function PactDetail() {
   const deadlineDate = deadlineMs > 0 ? new Date(deadlineMs).toLocaleString() : "None";
 
   return (
-    <main className="min-h-screen bg-[#060B18]">
+    <main className="min-h-screen bg-[#FFFFFF]">
       <Navbar />
       <div className="max-w-lg mx-auto px-6 pt-28 pb-16">
         <div className="flex items-center gap-2 mb-6">
@@ -155,7 +155,7 @@ export default function PactDetail() {
 
         {fields && (
           <div className="space-y-4">
-            <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] space-y-3">
+            <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">From</span>
                 <span className="font-mono">{shortenAddress(fields.sender)}</span>
@@ -175,7 +175,7 @@ export default function PactDetail() {
             </div>
 
             {fields.description && (
-              <div className="p-4 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A]">
+              <div className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
                 <p className="text-xs text-[#6B7280] mb-1 uppercase tracking-wide">Summary</p>
                 <p className="text-sm">{fields.description}</p>
               </div>
@@ -189,7 +189,7 @@ export default function PactDetail() {
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
-                    <p className="text-xs font-semibold text-white">Terms Document</p>
+                    <p className="text-xs font-semibold text-[#111827]">Terms Document</p>
                     <span className="text-xs text-[#6B7280]">— stored on Walrus</span>
                   </div>
                   <a
@@ -218,7 +218,7 @@ export default function PactDetail() {
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
-                    <p className="text-xs font-semibold text-white">Completion Receipt</p>
+                    <p className="text-xs font-semibold text-[#111827]">Completion Receipt</p>
                     <span className="text-xs text-[#6B7280]">— saved to Walrus</span>
                   </div>
                   <a

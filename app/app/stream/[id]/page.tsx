@@ -99,7 +99,7 @@ export default function StreamDetail() {
     : "0";
 
   return (
-    <main className="min-h-screen bg-[#060B18]">
+    <main className="min-h-screen bg-[#FFFFFF]">
       <Navbar />
       <div className="max-w-lg mx-auto px-6 pt-28 pb-16">
         <div className="flex items-center gap-2 mb-6">
@@ -115,7 +115,7 @@ export default function StreamDetail() {
 
         {fields && (
           <div className="space-y-4">
-            <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] space-y-3">
+            <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">From</span>
                 <span className="font-mono">{shortenAddress(fields.sender)}</span>

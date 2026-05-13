@@ -61,7 +61,7 @@ export default function NewStream() {
 
   if (!account) {
     return (
-      <main className="min-h-screen bg-[#060B18]">
+      <main className="min-h-screen bg-[#FFFFFF]">
         <Navbar />
         <div className="max-w-6xl mx-auto px-6 pt-40 text-center">
           <p className="text-[#6B7280]">Connect your wallet first.</p>
@@ -71,7 +71,7 @@ export default function NewStream() {
   }
 
   return (
-    <main className="min-h-screen bg-[#060B18]">
+    <main className="min-h-screen bg-[#FFFFFF]">
       <Navbar />
       <div className="max-w-lg mx-auto px-6 pt-28 pb-16">
         <h1 className="text-2xl font-bold mb-2">Create Stream</h1>
@@ -87,8 +87,8 @@ export default function NewStream() {
                   onClick={() => setCoinType(opt.value)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     coinType === opt.value
-                      ? "bg-[#2563EB] text-white"
-                      : "bg-[#0F0F1A] border border-[#0F1E3D] text-[#6B7280] hover:text-white"
+                      ? "bg-[#2563EB] text-[#111827]"
+                      : "bg-[#F8FAFC] border border-[#E2E8F0] text-[#6B7280] hover:text-[#111827]"
                   }`}
                 >
                   {opt.label}
@@ -104,7 +104,7 @@ export default function NewStream() {
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
               placeholder="0x..."
-              className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] font-mono"
+              className="w-full px-4 py-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB] font-mono"
             />
           </div>
 
@@ -118,7 +118,7 @@ export default function NewStream() {
                 placeholder="0.0001"
                 step="0.0001"
                 min="0"
-                className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] pr-16"
+                className="w-full px-4 py-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB] pr-16"
               />
               <span className="absolute right-4 top-3 text-sm text-[#6B7280]">
                 {COIN_OPTIONS.find((o) => o.value === coinType)?.label}
@@ -136,7 +136,7 @@ export default function NewStream() {
                 placeholder="1.0"
                 step="0.01"
                 min="0"
-                className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] pr-16"
+                className="w-full px-4 py-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB] pr-16"
               />
               <span className="absolute right-4 top-3 text-sm text-[#6B7280]">
                 {COIN_OPTIONS.find((o) => o.value === coinType)?.label}

@@ -27,7 +27,7 @@ export default function ZkLoginButton() {
   return (
     <button
       onClick={() => beginZkLogin(suiClient as Parameters<typeof beginZkLogin>[0])}
-      className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#0F1E3D] bg-[#0F0F1A] text-sm text-white hover:border-[#2563EB] transition-colors"
+      className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-sm text-[#111827] hover:border-[#2563EB] transition-colors"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
