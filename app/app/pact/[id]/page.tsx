@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import { PACKAGE_ID } from "@/constants";
 import { mistToSui, shortenAddress } from "@/lib/sui";
 import { fetchTextFromWalrus, uploadToWalrus, walrusBlobUrl } from "@/lib/walrus";
+import { useZkLogin } from "@/contexts/ZkLoginContext";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   "0": { label: "Pending", color: "text-[#F59E0B] bg-[#F59E0B20]" },
@@ -24,7 +25,11 @@ function extractCoinType(objectType: string): string {
 export default function PactDetail() {
   const { id } = useParams<{ id: string }>();
   const account = useCurrentAccount();
-  const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
+  const { session, execute } = useZkLogin();
+  const activeAddress = account?.address ?? session?.address ?? null;
+  const { mutate: signAndExecute, isPending: walletPending } = useSignAndExecuteTransaction();
+  const [loading, setLoading] = useState(false);
+  const isPending = walletPending || loading;
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [walrusContent, setWalrusContent] = useState<string | null>(null);
@@ -73,8 +78,8 @@ export default function PactDetail() {
     }
   }
 
-  function handleComplete() {
-    if (!account) return;
+  async function handleComplete() {
+    if (!activeAddress) return;
     setError(""); setSuccess("");
     const tx = new Transaction();
     tx.moveCall({
@@ -82,21 +87,35 @@ export default function PactDetail() {
       typeArguments: [coinType],
       arguments: [tx.object(id), tx.object("0x6")],
     });
-    signAndExecute(
-      { transaction: tx },
-      {
-        onSuccess: () => {
-          setSuccess("Pact completed. Funds released.");
-          refetch();
-          generateAndUploadReceipt();
-        },
-        onError: (err) => setError(err.message),
+    if (session) {
+      setLoading(true);
+      try {
+        await execute(tx);
+        setSuccess("Pact completed. Funds released.");
+        refetch();
+        generateAndUploadReceipt();
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Transaction failed");
+      } finally {
+        setLoading(false);
       }
-    );
+    } else {
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: () => {
+            setSuccess("Pact completed. Funds released.");
+            refetch();
+            generateAndUploadReceipt();
+          },
+          onError: (err) => setError(err.message),
+        }
+      );
+    }
   }
 
-  function handleCancel() {
-    if (!account) return;
+  async function handleCancel() {
+    if (!activeAddress) return;
     setError(""); setSuccess("");
     const tx = new Transaction();
     tx.moveCall({
@@ -104,17 +123,30 @@ export default function PactDetail() {
       typeArguments: [coinType],
       arguments: [tx.object(id)],
     });
-    signAndExecute(
-      { transaction: tx },
-      {
-        onSuccess: () => { setSuccess("Pact cancelled. Funds returned."); refetch(); },
-        onError: (err) => setError(err.message),
+    if (session) {
+      setLoading(true);
+      try {
+        await execute(tx);
+        setSuccess("Pact cancelled. Funds returned.");
+        refetch();
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Transaction failed");
+      } finally {
+        setLoading(false);
       }
-    );
+    } else {
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: () => { setSuccess("Pact cancelled. Funds returned."); refetch(); },
+          onError: (err) => setError(err.message),
+        }
+      );
+    }
   }
 
-  function handleDispute() {
-    if (!account) return;
+  async function handleDispute() {
+    if (!activeAddress) return;
     setError(""); setSuccess("");
     const tx = new Transaction();
     tx.moveCall({
@@ -122,17 +154,30 @@ export default function PactDetail() {
       typeArguments: [coinType],
       arguments: [tx.object(id)],
     });
-    signAndExecute(
-      { transaction: tx },
-      {
-        onSuccess: () => { setSuccess("Dispute raised."); refetch(); },
-        onError: (err) => setError(err.message),
+    if (session) {
+      setLoading(true);
+      try {
+        await execute(tx);
+        setSuccess("Dispute raised.");
+        refetch();
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Transaction failed");
+      } finally {
+        setLoading(false);
       }
-    );
+    } else {
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: () => { setSuccess("Dispute raised."); refetch(); },
+          onError: (err) => setError(err.message),
+        }
+      );
+    }
   }
 
-  const isSender = account?.address?.toLowerCase() === fields?.sender?.toLowerCase();
-  const isRecipient = account?.address?.toLowerCase() === fields?.recipient?.toLowerCase();
+  const isSender = activeAddress?.toLowerCase() === fields?.sender?.toLowerCase();
+  const isRecipient = activeAddress?.toLowerCase() === fields?.recipient?.toLowerCase();
   const isPending2 = String(fields?.status) === "0";
   const statusInfo = STATUS_LABELS[String(fields?.status ?? "0")];
   const deadlineMs = fields?.deadline ? Number(fields.deadline) : 0;
@@ -203,7 +248,7 @@ export default function PactDetail() {
                 </div>
                 {walrusLoading && <p className="text-xs text-[#6B7280]">Fetching from Walrus...</p>}
                 {walrusContent && !walrusLoading && (
-                  <pre className="text-xs text-[#A1A1AA] whitespace-pre-wrap break-words max-h-48 overflow-y-auto leading-relaxed">
+                  <pre className="text-xs text-[#374151] whitespace-pre-wrap break-words max-h-48 overflow-y-auto leading-relaxed">
                     {walrusContent}
                   </pre>
                 )}
@@ -243,7 +288,7 @@ export default function PactDetail() {
                     <button
                       onClick={handleComplete}
                       disabled={isPending}
-                      className="flex-1 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 font-medium text-sm transition-colors"
+                      className="flex-1 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white disabled:opacity-50 font-medium text-sm transition-colors"
                     >
                       {isPending ? "Processing..." : "Release Funds"}
                     </button>

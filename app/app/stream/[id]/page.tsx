@@ -7,11 +7,16 @@ import { Transaction } from "@mysten/sui/transactions";
 import Navbar from "@/components/Navbar";
 import { PACKAGE_ID } from "@/constants";
 import { mistToSui, shortenAddress } from "@/lib/sui";
+import { useZkLogin } from "@/contexts/ZkLoginContext";
 
 export default function StreamDetail() {
   const { id } = useParams<{ id: string }>();
   const account = useCurrentAccount();
-  const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
+  const { session, execute } = useZkLogin();
+  const activeAddress = account?.address ?? session?.address ?? null;
+  const { mutate: signAndExecute, isPending: walletPending } = useSignAndExecuteTransaction();
+  const [loading, setLoading] = useState(false);
+  const isPending = walletPending || loading;
   const [claimable, setClaimable] = useState(0n);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -48,8 +53,8 @@ export default function StreamDetail() {
     return () => clearInterval(interval);
   }, [fields]);
 
-  function handleWithdraw() {
-    if (!account || !coinType) return;
+  async function handleWithdraw() {
+    if (!activeAddress || !coinType) return;
     setError(""); setSuccess("");
 
     const tx = new Transaction();
@@ -59,17 +64,30 @@ export default function StreamDetail() {
       arguments: [tx.object(id), tx.object("0x6")],
     });
 
-    signAndExecute(
-      { transaction: tx },
-      {
-        onSuccess: () => { setSuccess("Withdrawal successful."); refetch(); },
-        onError: (err) => setError(err.message),
+    if (session) {
+      setLoading(true);
+      try {
+        await execute(tx);
+        setSuccess("Withdrawal successful.");
+        refetch();
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Transaction failed");
+      } finally {
+        setLoading(false);
       }
-    );
+    } else {
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: () => { setSuccess("Withdrawal successful."); refetch(); },
+          onError: (err) => setError(err.message),
+        }
+      );
+    }
   }
 
-  function handleCancel() {
-    if (!account || !coinType) return;
+  async function handleCancel() {
+    if (!activeAddress || !coinType) return;
     setError(""); setSuccess("");
 
     const tx = new Transaction();
@@ -79,17 +97,30 @@ export default function StreamDetail() {
       arguments: [tx.object(id), tx.object("0x6")],
     });
 
-    signAndExecute(
-      { transaction: tx },
-      {
-        onSuccess: () => { setSuccess("Stream cancelled."); refetch(); },
-        onError: (err) => setError(err.message),
+    if (session) {
+      setLoading(true);
+      try {
+        await execute(tx);
+        setSuccess("Stream cancelled.");
+        refetch();
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Transaction failed");
+      } finally {
+        setLoading(false);
       }
-    );
+    } else {
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: () => { setSuccess("Stream cancelled."); refetch(); },
+          onError: (err) => setError(err.message),
+        }
+      );
+    }
   }
 
-  const isSender = account?.address === fields?.sender;
-  const isRecipient = account?.address === fields?.recipient;
+  const isSender = activeAddress?.toLowerCase() === fields?.sender?.toLowerCase();
+  const isRecipient = activeAddress?.toLowerCase() === fields?.recipient?.toLowerCase();
   const isActive = fields?.is_active === "true";
 
   const balanceRaw = fields?.balance
@@ -135,9 +166,9 @@ export default function StreamDetail() {
             </div>
 
             {isActive && (
-              <div className="p-6 rounded-xl border border-[#2563EB40] bg-[#1E1040] text-center">
-                <p className="text-xs text-[#A78BFA] mb-1 uppercase tracking-wide">Claimable now</p>
-                <p className="text-4xl font-bold font-mono">{mistToSui(claimable)}</p>
+              <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-center">
+                <p className="text-xs text-[#6B7280] mb-1 uppercase tracking-wide">Claimable now</p>
+                <p className="text-4xl font-bold font-mono text-[#2563EB]">{mistToSui(claimable)}</p>
                 <p className="text-xs text-[#6B7280] mt-1">Updates every second</p>
               </div>
             )}
@@ -150,7 +181,7 @@ export default function StreamDetail() {
                 <button
                   onClick={handleWithdraw}
                   disabled={isPending || claimable === 0n}
-                  className="flex-1 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 font-medium text-sm transition-colors"
+                  className="flex-1 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white disabled:opacity-50 font-medium text-sm transition-colors"
                 >
                   {isPending ? "Processing..." : "Withdraw"}
                 </button>
