@@ -34,10 +34,19 @@ export interface ZkLoginSession {
   headerBase64: string;
 }
 
-function decodeJwtPayload(jwt: string): Record<string, unknown> {
+export function decodeJwtPayload(jwt: string): Record<string, unknown> {
   const base64url = jwt.split(".")[1];
   const base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
   return JSON.parse(atob(base64)) as Record<string, unknown>;
+}
+
+export function computeAddressSeed(salt: string, jwt: string): string {
+  const payload = decodeJwtPayload(jwt);
+  const sub = payload.sub as string;
+  const aud = Array.isArray(payload.aud)
+    ? (payload.aud as string[])[0]
+    : (payload.aud as string);
+  return genAddressSeed(BigInt(salt), "sub", sub, aud).toString();
 }
 
 export async function beginZkLogin(suiClient: SuiClientLike) {
@@ -98,13 +107,12 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
     throw new Error(`Prover error: ${JSON.stringify(proof)}`);
   }
 
-  // addressSeed is NOT returned by the prover — compute it from the JWT payload
-  const jwtPayload = decodeJwtPayload(jwt);
-  const sub = jwtPayload.sub as string;
-  const aud = Array.isArray(jwtPayload.aud)
-    ? (jwtPayload.aud as string[])[0]
-    : (jwtPayload.aud as string);
-  const addressSeed = genAddressSeed(BigInt(salt), "sub", sub, aud).toString();
+  // Prefer the prover's addressSeed (guaranteed to match the proof).
+  // If the prover doesn't return it, compute locally using the same formula.
+  const addressSeed =
+    typeof proof.addressSeed === "string" && proof.addressSeed
+      ? proof.addressSeed
+      : computeAddressSeed(salt, jwt);
 
   const session: ZkLoginSession = {
     address,
@@ -126,7 +134,16 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
 export function loadZkLoginSession(): ZkLoginSession | null {
   try {
     const raw = localStorage.getItem("zkl_session");
-    return raw ? (JSON.parse(raw) as ZkLoginSession) : null;
+    if (!raw) return null;
+    const session = JSON.parse(raw) as ZkLoginSession;
+
+    // Repair sessions stored before the addressSeed fix — recompute from stored jwt + salt.
+    if (!session.addressSeed && session.jwt && session.salt) {
+      session.addressSeed = computeAddressSeed(session.salt, session.jwt);
+      localStorage.setItem("zkl_session", JSON.stringify(session));
+    }
+
+    return session;
   } catch {
     return null;
   }
@@ -140,6 +157,10 @@ export function clearZkLoginSession() {
 }
 
 export async function zkExecuteTransaction(tx: Transaction, session: ZkLoginSession, suiClient: SuiClientLike) {
+  if (!session.addressSeed) {
+    throw new Error("Session is missing addressSeed. Please sign out and sign back in.");
+  }
+
   const keypair = Ed25519Keypair.fromSecretKey(session.ephemeralKeyStr);
 
   tx.setSender(session.address);
