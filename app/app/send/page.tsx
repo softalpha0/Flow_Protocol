@@ -41,14 +41,26 @@ export default function Send() {
   async function handleSend() {
     if (!activeAddress) return;
     setError(""); setSuccess("");
+
+    if (mode === "single") {
+      if (!singleRecipient.trim()) { setError("Recipient address is required."); return; }
+      if (!singleRecipient.startsWith("0x")) { setError("Enter a valid Sui address starting with 0x."); return; }
+      if (!singleAmount || Number(singleAmount) <= 0) { setError("Enter a valid amount."); return; }
+    } else {
+      for (const r of recipients) {
+        if (!r.address.trim() || !r.address.startsWith("0x")) { setError("All recipient addresses must be valid Sui addresses."); return; }
+        if (!r.amount || Number(r.amount) <= 0) { setError("All amounts must be greater than 0."); return; }
+      }
+    }
+
     try {
       const tx = new Transaction();
       if (mode === "single") {
         const amount = suiToMist(singleAmount);
         const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(amount)]);
-        tx.moveCall({ target: `${PACKAGE_ID}::instant::send`, typeArguments: [coinType], arguments: [coin, tx.pure.address(singleRecipient)] });
+        tx.moveCall({ target: `${PACKAGE_ID}::instant::send`, typeArguments: [coinType], arguments: [coin, tx.pure.address(singleRecipient.trim())] });
       } else {
-        const addrs = recipients.map((r) => r.address);
+        const addrs = recipients.map((r) => r.address.trim());
         const amounts = recipients.map((r) => suiToMist(r.amount));
         const total = amounts.reduce((a, b) => a + b, 0n);
         const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(total)]);
@@ -146,7 +158,13 @@ export default function Send() {
           )}
           {error && <p className="text-sm text-[#EF4444] bg-red-50 px-4 py-3 rounded-lg">{error}</p>}
           {success && <p className="text-sm text-[#10B981] bg-green-50 px-4 py-3 rounded-lg">{success}</p>}
-          <button onClick={handleSend} disabled={isPending}
+          <button
+            onClick={handleSend}
+            disabled={
+              isPending ||
+              (mode === "single" && (!singleRecipient || !singleAmount)) ||
+              (mode === "split" && recipients.some((r) => !r.address || !r.amount))
+            }
             className="w-full py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors">
             {isPending ? "Sending..." : "Send"}
           </button>

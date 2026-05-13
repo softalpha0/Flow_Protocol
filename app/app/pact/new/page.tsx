@@ -45,6 +45,10 @@ export default function NewPact() {
     if (!activeAddress) return;
     setError("");
 
+    if (!recipient.trim().startsWith("0x")) { setError("Enter a valid Sui address starting with 0x."); return; }
+    if (!description.trim()) { setError("Summary is required."); return; }
+    if (Number(amount) <= 0) { setError("Amount must be greater than 0."); return; }
+
     try {
       let walrusBlobId = "";
       const hasAttachment = attachedFile || extendedTerms.trim();
@@ -74,7 +78,7 @@ export default function NewPact() {
         target: `${PACKAGE_ID}::pact::create_pact`,
         typeArguments: [coinType],
         arguments: [
-          tx.pure.address(recipient),
+          tx.pure.address(recipient.trim()),
           tx.pure.vector("u8", descBytes),
           tx.pure.vector("u8", blobBytes),
           tx.pure.u64(deadlineMs),

@@ -33,6 +33,10 @@ export default function NewStream() {
     if (!activeAddress) return;
     setError("");
 
+    if (!recipient.trim().startsWith("0x")) { setError("Enter a valid Sui address starting with 0x."); return; }
+    if (Number(ratePerSecond) <= 0) { setError("Rate per second must be greater than 0."); return; }
+    if (Number(depositAmount) <= 0) { setError("Deposit amount must be greater than 0."); return; }
+
     try {
       const rateMist = suiToMist(ratePerSecond);
       const depositMist = suiToMist(depositAmount);
@@ -41,7 +45,7 @@ export default function NewStream() {
       tx.moveCall({
         target: `${PACKAGE_ID}::stream::create_stream`,
         typeArguments: [coinType],
-        arguments: [tx.pure.address(recipient), tx.pure.u64(rateMist), coin, tx.object("0x6")],
+        arguments: [tx.pure.address(recipient.trim()), tx.pure.u64(rateMist), coin, tx.object("0x6")],
       });
 
       if (session) {
