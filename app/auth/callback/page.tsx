@@ -19,7 +19,14 @@ export default function AuthCallback() {
     const jwt = params.get("id_token");
 
     if (!jwt) {
-      setError("No token received from Google.");
+      setError("No token received. Please try signing in again.");
+      return;
+    }
+
+    const epochStr = sessionStorage.getItem("zkl_epoch");
+    const keyStr = sessionStorage.getItem("zkl_key");
+    if (!epochStr || !keyStr) {
+      setError("Session expired. Please go back and sign in again.");
       return;
     }
 
@@ -30,18 +37,22 @@ export default function AuthCallback() {
         setStatus("Done! Redirecting...");
         router.push("/app");
       })
-      .catch((err: Error) => {
-        setError(err.message ?? "Something went wrong.");
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(`Login failed: ${msg}`);
       });
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
+    <main className="min-h-screen bg-white flex items-center justify-center">
       <div className="text-center px-6">
         {error ? (
           <div>
-            <p className="text-[#EF4444] mb-2 text-sm">{error}</p>
-            <button onClick={() => router.push("/")} className="text-sm text-[#6B7280] hover:text-[#111827]">
+            <p className="text-[#EF4444] mb-4 text-sm">{error}</p>
+            <button
+              onClick={() => router.push("/")}
+              className="text-sm text-[#2563EB] hover:underline"
+            >
               Go back
             </button>
           </div>
@@ -49,7 +60,7 @@ export default function AuthCallback() {
           <div>
             <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-[#6B7280] text-sm">{status}</p>
-            <p className="text-xs text-[#374151] mt-2">Fetching ZK proof from Mysten prover...</p>
+            <p className="text-xs text-[#9CA3AF] mt-2">Fetching ZK proof from Mysten prover...</p>
           </div>
         )}
       </div>
