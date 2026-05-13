@@ -37,7 +37,7 @@ export default function NewStream() {
       const rateMist = suiToMist(ratePerSecond);
       const depositMist = suiToMist(depositAmount);
       const tx = new Transaction();
-      const [coin] = tx.splitCoins(tx.gas, [depositMist]);
+      const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(depositMist)]);
       tx.moveCall({
         target: `${PACKAGE_ID}::stream::create_stream`,
         typeArguments: [coinType],

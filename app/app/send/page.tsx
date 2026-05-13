@@ -45,13 +45,13 @@ export default function Send() {
       const tx = new Transaction();
       if (mode === "single") {
         const amount = suiToMist(singleAmount);
-        const [coin] = tx.splitCoins(tx.gas, [amount]);
+        const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(amount)]);
         tx.moveCall({ target: `${PACKAGE_ID}::instant::send`, typeArguments: [coinType], arguments: [coin, tx.pure.address(singleRecipient)] });
       } else {
         const addrs = recipients.map((r) => r.address);
         const amounts = recipients.map((r) => suiToMist(r.amount));
         const total = amounts.reduce((a, b) => a + b, 0n);
-        const [coin] = tx.splitCoins(tx.gas, [total]);
+        const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(total)]);
         tx.moveCall({ target: `${PACKAGE_ID}::instant::split_send`, typeArguments: [coinType], arguments: [coin, tx.pure.vector("address", addrs), tx.pure.vector("u64", amounts)] });
       }
 

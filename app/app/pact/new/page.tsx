@@ -69,7 +69,7 @@ export default function NewPact() {
       const blobBytes = Array.from(new TextEncoder().encode(walrusBlobId));
 
       const tx = new Transaction();
-      const [coin] = tx.splitCoins(tx.gas, [amountMist]);
+      const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(amountMist)]);
       tx.moveCall({
         target: `${PACKAGE_ID}::pact::create_pact`,
         typeArguments: [coinType],
