@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { PACKAGE_ID } from "@/constants";
 import { mistToSui, shortenAddress } from "@/lib/sui";
+import { useZkLogin } from "@/contexts/ZkLoginContext";
 
 type EventFields = {
   stream_id?: string;
@@ -19,6 +20,8 @@ type EventFields = {
 
 export default function Dashboard() {
   const account = useCurrentAccount();
+  const { session } = useZkLogin();
+  const activeAddress = account?.address ?? session?.address ?? null;
 
   const { data: streamEvents } = useSuiClientQuery(
     "queryEvents",
@@ -26,7 +29,7 @@ export default function Dashboard() {
       query: { MoveEventType: `${PACKAGE_ID}::stream::StreamCreated` },
       limit: 20,
     },
-    { enabled: !!account }
+    { enabled: !!activeAddress }
   );
 
   const { data: pactEvents } = useSuiClientQuery(
@@ -35,16 +38,15 @@ export default function Dashboard() {
       query: { MoveEventType: `${PACKAGE_ID}::pact::PactCreated` },
       limit: 20,
     },
-    { enabled: !!account }
+    { enabled: !!activeAddress }
   );
 
-  if (!account) {
+  if (!activeAddress) {
     return (
-      <main className="min-h-screen bg-[#FFFFFF]">
-        <Navbar />
+      <main className="min-h-screen bg-white">
         <div className="max-w-6xl mx-auto px-6 pt-40 text-center">
           <h2 className="text-2xl font-semibold mb-3">Connect your wallet</h2>
-          <p className="text-[#6B7280] text-sm">Connect a Sui wallet to access your dashboard.</p>
+          <p className="text-[#6B7280] text-sm">Sign in with Google or connect a Sui wallet to access your dashboard.</p>
         </div>
       </main>
     );
@@ -52,43 +54,33 @@ export default function Dashboard() {
 
   const myStreams = streamEvents?.data?.filter((e) => {
     const f = e.parsedJson as EventFields;
-    return f?.sender === account.address || f?.recipient === account.address;
+    return f?.sender === activeAddress || f?.recipient === activeAddress;
   }) ?? [];
 
   const myPacts = pactEvents?.data?.filter((e) => {
     const f = e.parsedJson as EventFields;
-    return f?.sender === account.address || f?.recipient === account.address;
+    return f?.sender === activeAddress || f?.recipient === activeAddress;
   }) ?? [];
 
   return (
-    <main className="min-h-screen bg-[#FFFFFF]">
-      <Navbar />
+    <main className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-6 pt-28 pb-16">
         <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
 
         <div className="grid md:grid-cols-3 gap-4 mb-10">
-          <Link
-            href="/app/stream/new"
-            className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group"
-          >
+          <Link href="/app/stream/new" className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group">
             <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Stream</p>
-            <p className="font-semibold group-hover:text-[#A78BFA] transition-colors">Create a payment stream</p>
+            <p className="font-semibold group-hover:text-[#2563EB] transition-colors">Create a payment stream</p>
             <p className="text-sm text-[#6B7280] mt-1">Pay per second to any address</p>
           </Link>
-          <Link
-            href="/app/pact/new"
-            className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group"
-          >
+          <Link href="/app/pact/new" className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group">
             <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Pact</p>
-            <p className="font-semibold group-hover:text-[#A78BFA] transition-colors">Create a pact</p>
+            <p className="font-semibold group-hover:text-[#2563EB] transition-colors">Create a pact</p>
             <p className="text-sm text-[#6B7280] mt-1">Milestone escrow with deadline</p>
           </Link>
-          <Link
-            href="/app/send"
-            className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group"
-          >
+          <Link href="/app/send" className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group">
             <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Instant</p>
-            <p className="font-semibold group-hover:text-[#A78BFA] transition-colors">Send or split</p>
+            <p className="font-semibold group-hover:text-[#2563EB] transition-colors">Send or split</p>
             <p className="text-sm text-[#6B7280] mt-1">One or many recipients</p>
           </Link>
         </div>
@@ -100,22 +92,17 @@ export default function Dashboard() {
               {myStreams.map((e) => {
                 const f = e.parsedJson as EventFields;
                 const id = f.stream_id;
-                const isSender = f.sender === account.address;
+                const isSender = f.sender === activeAddress;
                 return (
-                  <Link
-                    key={e.id.txDigest + e.id.eventSeq}
-                    href={`/app/stream/${id}`}
-                    className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors"
-                  >
+                  <Link key={e.id.txDigest + e.id.eventSeq} href={`/app/stream/${id}`}
+                    className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors">
                     <div>
                       <p className="text-sm font-medium">
                         {isSender ? "To " : "From "}
-                        <span className="font-mono text-[#A78BFA]">
-                          {shortenAddress(isSender ? f.recipient : f.sender)}
-                        </span>
+                        <span className="font-mono text-[#2563EB]">{shortenAddress(isSender ? f.recipient : f.sender)}</span>
                       </p>
                       <p className="text-xs text-[#6B7280] mt-0.5">
-                        {mistToSui(BigInt(f.deposit ?? 0))} SUI deposited &middot; {mistToSui(BigInt(f.rate_per_second ?? 0))} SUI/sec
+                        {mistToSui(BigInt(f.deposit ?? 0))} SUI deposited · {mistToSui(BigInt(f.rate_per_second ?? 0))} SUI/sec
                       </p>
                     </div>
                     <span className="text-xs text-[#6B7280]">View</span>
@@ -133,23 +120,16 @@ export default function Dashboard() {
               {myPacts.map((e) => {
                 const f = e.parsedJson as EventFields;
                 const id = f.pact_id;
-                const isSender = f.sender === account.address;
+                const isSender = f.sender === activeAddress;
                 return (
-                  <Link
-                    key={e.id.txDigest + e.id.eventSeq}
-                    href={`/app/pact/${id}`}
-                    className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors"
-                  >
+                  <Link key={e.id.txDigest + e.id.eventSeq} href={`/app/pact/${id}`}
+                    className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors">
                     <div>
                       <p className="text-sm font-medium">
                         {isSender ? "To " : "From "}
-                        <span className="font-mono text-[#A78BFA]">
-                          {shortenAddress(isSender ? f.recipient : f.sender)}
-                        </span>
+                        <span className="font-mono text-[#2563EB]">{shortenAddress(isSender ? f.recipient : f.sender)}</span>
                       </p>
-                      <p className="text-xs text-[#6B7280] mt-0.5">
-                        {mistToSui(BigInt(f.amount ?? 0))} SUI locked
-                      </p>
+                      <p className="text-xs text-[#6B7280] mt-0.5">{mistToSui(BigInt(f.amount ?? 0))} SUI locked</p>
                     </div>
                     <span className="text-xs text-[#6B7280]">View</span>
                   </Link>
@@ -166,8 +146,8 @@ export default function Dashboard() {
         )}
 
         <div className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] mt-4">
-          <p className="text-xs text-[#6B7280]">Connected as</p>
-          <p className="font-mono text-xs mt-1 text-[#A78BFA] break-all">{account.address}</p>
+          <p className="text-xs text-[#6B7280]">Signed in as</p>
+          <p className="font-mono text-xs mt-1 text-[#2563EB] break-all">{activeAddress}</p>
         </div>
       </div>
     </main>
