@@ -126,6 +126,9 @@ export function clearZkLoginSession() {
 
 export async function zkExecuteTransaction(tx: Transaction, session: ZkLoginSession, suiClient: SuiClientLike) {
   const keypair = Ed25519Keypair.fromSecretKey(session.ephemeralKeyStr);
+
+  tx.setSender(session.address);
+
   const txBytes = await tx.build({ client: suiClient as never });
   const { signature: ephem } = await keypair.signTransaction(txBytes);
 
