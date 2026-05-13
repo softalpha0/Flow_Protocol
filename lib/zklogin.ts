@@ -114,6 +114,17 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
       ? proof.addressSeed
       : computeAddressSeed(salt, jwt);
 
+  const jwtPayload = decodeJwtPayload(jwt);
+  console.log("[zklogin] completeZkLogin debug:", {
+    salt,
+    sub: jwtPayload.sub,
+    aud: jwtPayload.aud,
+    address,
+    addressSeed,
+    maxEpoch,
+    proofAddressSeed: proof.addressSeed ?? "(not returned by prover)",
+  });
+
   const session: ZkLoginSession = {
     address,
     jwt,
@@ -160,6 +171,8 @@ export async function zkExecuteTransaction(tx: Transaction, session: ZkLoginSess
   if (!session.addressSeed) {
     throw new Error("Session is missing addressSeed. Please sign out and sign back in.");
   }
+
+  console.log("[zklogin] zkExecuteTransaction — address:", session.address, "addressSeed:", session.addressSeed, "maxEpoch:", session.maxEpoch);
 
   const keypair = Ed25519Keypair.fromSecretKey(session.ephemeralKeyStr);
 
