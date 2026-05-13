@@ -5,6 +5,7 @@ import {
   jwtToAddress,
   getExtendedEphemeralPublicKey,
   getZkLoginSignature,
+  genAddressSeed,
 } from "@mysten/sui/zklogin";
 import { Transaction } from "@mysten/sui/transactions";
 
@@ -31,6 +32,12 @@ export interface ZkLoginSession {
   proofPoints: { a: string[]; b: string[][]; c: string[] };
   issBase64Details: { value: string; indexMod4: number };
   headerBase64: string;
+}
+
+function decodeJwtPayload(jwt: string): Record<string, unknown> {
+  const base64url = jwt.split(".")[1];
+  const base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
+  return JSON.parse(atob(base64)) as Record<string, unknown>;
 }
 
 export async function beginZkLogin(suiClient: SuiClientLike) {
@@ -91,6 +98,14 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
     throw new Error(`Prover error: ${JSON.stringify(proof)}`);
   }
 
+  // addressSeed is NOT returned by the prover — compute it from the JWT payload
+  const jwtPayload = decodeJwtPayload(jwt);
+  const sub = jwtPayload.sub as string;
+  const aud = Array.isArray(jwtPayload.aud)
+    ? (jwtPayload.aud as string[])[0]
+    : (jwtPayload.aud as string);
+  const addressSeed = genAddressSeed(BigInt(salt), "sub", sub, aud).toString();
+
   const session: ZkLoginSession = {
     address,
     jwt,
@@ -98,7 +113,7 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
     maxEpoch,
     randomness,
     ephemeralKeyStr,
-    addressSeed: proof.addressSeed as string,
+    addressSeed,
     proofPoints: proof.proofPoints as ZkLoginSession["proofPoints"],
     issBase64Details: proof.issBase64Details as ZkLoginSession["issBase64Details"],
     headerBase64: proof.headerBase64 as string,
