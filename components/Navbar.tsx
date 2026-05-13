@@ -22,8 +22,10 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#0F1E3D] bg-[#060B18]/90 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <Image src="/logo.png" alt="Flow" width={32} height={32} className="rounded-sm" />
+        <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
+          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-white">
+            <Image src="/logo.png" alt="Flow" width={28} height={28} />
+          </div>
           <span className="text-xl font-bold tracking-tight">flow<span className="text-[#2563EB]">.</span></span>
         </Link>
         <div className="hidden md:flex items-center gap-6">
