@@ -66,7 +66,11 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token: jwt }),
   });
-  const { salt } = await saltRes.json() as { salt: string };
+  const saltData = await saltRes.json() as Record<string, unknown>;
+  if (!saltData.salt) {
+    throw new Error(`Salt service error: ${JSON.stringify(saltData)}`);
+  }
+  const salt = saltData.salt as string;
 
   const address = jwtToAddress(jwt, salt, false);
 
@@ -82,12 +86,10 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
       keyClaimName: "sub",
     }),
   });
-  const proof = await proofRes.json() as {
-    proofPoints: ZkLoginSession["proofPoints"];
-    issBase64Details: ZkLoginSession["issBase64Details"];
-    headerBase64: string;
-    addressSeed: string;
-  };
+  const proof = await proofRes.json() as Record<string, unknown>;
+  if (!proof.proofPoints) {
+    throw new Error(`Prover error: ${JSON.stringify(proof)}`);
+  }
 
   const session: ZkLoginSession = {
     address,
@@ -96,10 +98,10 @@ export async function completeZkLogin(jwt: string, suiClient: SuiClientLike): Pr
     maxEpoch,
     randomness,
     ephemeralKeyStr,
-    addressSeed: proof.addressSeed,
-    proofPoints: proof.proofPoints,
-    issBase64Details: proof.issBase64Details,
-    headerBase64: proof.headerBase64,
+    addressSeed: proof.addressSeed as string,
+    proofPoints: proof.proofPoints as ZkLoginSession["proofPoints"],
+    issBase64Details: proof.issBase64Details as ZkLoginSession["issBase64Details"],
+    headerBase64: proof.headerBase64 as string,
   };
 
   localStorage.setItem("zkl_session", JSON.stringify(session));
