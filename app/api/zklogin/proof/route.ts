@@ -1,36 +1,57 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Try production prover first (same circuit as testnet), fall back to dev prover
-const PROVERS = [
-  "https://prover-dev.mystenlabs.com/v1",
-];
+const PROVER_DEV = "https://prover-dev.mystenlabs.com/v1";
+const ENOKI_API = "https://api.enoki.mystenlabs.com";
 
 export async function POST(req: NextRequest) {
   const body = await req.json() as Record<string, unknown>;
+  const jwt = body.jwt as string;
+  const apiKey = process.env.ENOKI_API_KEY ?? "";
 
-  console.log("[zklogin/proof] request — maxEpoch:", body.maxEpoch, "keyClaimName:", body.keyClaimName);
+  console.log("[zklogin/proof] request — maxEpoch:", body.maxEpoch);
 
-  let lastError = "";
-  for (const proverUrl of PROVERS) {
-    try {
-      const res = await fetch(proverUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json() as Record<string, unknown>;
+  if (apiKey) {
+    const res = await fetch(`${ENOKI_API}/v1/zklogin/zkp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+        "zklogin-jwt": jwt,
+      },
+      body: JSON.stringify({
+        network: "testnet",
+        randomness: body.jwtRandomness,
+        maxEpoch: body.maxEpoch,
+        jwtRandomness: body.jwtRandomness,
+        extendedEphemeralPublicKey: body.extendedEphemeralPublicKey,
+        salt: body.salt,
+        keyClaimName: body.keyClaimName ?? "sub",
+      }),
+    });
 
-      console.log(`[zklogin/proof] ${proverUrl} → status ${res.status}, keys:`, Object.keys(data));
-      if (data.addressSeed) console.log("[zklogin/proof] prover returned addressSeed:", data.addressSeed);
-      if (data.proofPoints) {
-        return NextResponse.json(data, { status: 200 });
-      }
-      lastError = JSON.stringify(data);
-    } catch (e) {
-      lastError = String(e);
-      console.error(`[zklogin/proof] ${proverUrl} threw:`, e);
+    const data = await res.json() as Record<string, unknown>;
+    console.log("[zklogin/proof] Enoki status:", res.status, "keys:", Object.keys(data));
+
+    const proof = data.data as Record<string, unknown> | undefined;
+    if (res.ok && proof?.proofPoints) {
+      return NextResponse.json(proof, { status: 200 });
     }
+    console.error("[zklogin/proof] Enoki failed:", JSON.stringify(data));
   }
 
-  return NextResponse.json({ error: "All provers failed", detail: lastError }, { status: 500 });
+  const proverBody = { ...body, network: "testnet" };
+  const res = await fetch(PROVER_DEV, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(proverBody),
+  });
+
+  const data = await res.json() as Record<string, unknown>;
+  console.log("[zklogin/proof] prover-dev status:", res.status, "keys:", Object.keys(data));
+
+  if (data.proofPoints) {
+    return NextResponse.json(data, { status: 200 });
+  }
+
+  return NextResponse.json({ error: "All provers failed", detail: JSON.stringify(data) }, { status: 500 });
 }
