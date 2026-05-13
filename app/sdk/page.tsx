@@ -18,7 +18,7 @@ const sections = [
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
     <section id={id} className="scroll-mt-24 mb-16">
-      <h2 className="text-2xl font-bold text-white mb-6 pb-3 border-b border-[#1A1A2E]">{title}</h2>
+      <h2 className="text-2xl font-bold text-white mb-6 pb-3 border-b border-[#0F1E3D]">{title}</h2>
       {children}
     </section>
   );
@@ -27,7 +27,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <div className="flex gap-5 mb-8">
-      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#7C3AED]/20 border border-[#7C3AED]/40 flex items-center justify-center text-sm font-bold text-[#7C3AED]">
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2563EB]/20 border border-[#2563EB]/40 flex items-center justify-center text-sm font-bold text-[#2563EB]">
         {n}
       </div>
       <div className="flex-1">
@@ -40,7 +40,7 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 
 export default function SDKPage() {
   return (
-    <div className="min-h-screen bg-[#08080F] text-[#A1A1AA]">
+    <div className="min-h-screen bg-[#060B18] text-[#A1A1AA]">
       <div className="max-w-7xl mx-auto px-6 pt-28 pb-24">
         <div className="flex gap-12">
           <aside className="hidden lg:block w-56 flex-shrink-0">
@@ -57,9 +57,9 @@ export default function SDKPage() {
                   </a>
                 ))}
               </nav>
-              <div className="mt-8 p-4 rounded-xl border border-[#1A1A2E] bg-[#0D0D1A]">
+              <div className="mt-8 p-4 rounded-xl border border-[#0F1E3D] bg-[#080E1E]">
                 <p className="text-xs text-[#6B7280] mb-2">Package</p>
-                <p className="text-xs font-mono text-[#7C3AED] break-all">@flow-protocol/sdk</p>
+                <p className="text-xs font-mono text-[#2563EB] break-all">@flow-protocol/sdk</p>
                 <p className="text-xs text-[#6B7280] mt-3 mb-2">Network</p>
                 <p className="text-xs font-mono text-[#10B981]">Sui Testnet</p>
               </div>
@@ -68,7 +68,7 @@ export default function SDKPage() {
 
           <main className="flex-1 min-w-0">
             <div className="mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#7C3AED]/30 bg-[#7C3AED]/10 text-xs text-[#7C3AED] mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2563EB]/30 bg-[#2563EB]/10 text-xs text-[#2563EB] mb-4">
                 Developer SDK
               </div>
               <h1 className="text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4">
@@ -92,8 +92,8 @@ export default function SDKPage() {
                   { name: "FlowClient.pact", desc: "Create conditional escrow pacts with complete, dispute, and cancel flows." },
                   { name: "FlowClient.instant", desc: "Send or split-send tokens to multiple recipients in a single transaction." },
                 ].map((item) => (
-                  <div key={item.name} className="p-4 rounded-xl border border-[#1A1A2E] bg-[#0D0D1A]">
-                    <p className="text-sm font-mono text-[#7C3AED] mb-2">{item.name}</p>
+                  <div key={item.name} className="p-4 rounded-xl border border-[#0F1E3D] bg-[#080E1E]">
+                    <p className="text-sm font-mono text-[#2563EB] mb-2">{item.name}</p>
                     <p className="text-sm text-[#6B7280]">{item.desc}</p>
                   </div>
                 ))}
@@ -131,7 +131,7 @@ export default function SDKPage() {
                     desc: "Build crypto payroll products on top of Flow. Create streams per employee, denominated in any supported coin type including stablecoins.",
                   },
                 ].map((item) => (
-                  <div key={item.title} className="p-5 rounded-xl border border-[#1A1A2E] bg-[#0D0D1A]">
+                  <div key={item.title} className="p-5 rounded-xl border border-[#0F1E3D] bg-[#080E1E]">
                     <p className="font-semibold text-white mb-2">{item.title}</p>
                     <p className="text-sm text-[#6B7280]">{item.desc}</p>
                   </div>
@@ -143,12 +143,12 @@ export default function SDKPage() {
               <Step n={1} title="Install the SDK and its peer dependency">
                 <CodeBlock lang="bash" code={`npm install @flow-protocol/sdk @mysten/sui`} />
                 <p className="mt-3 text-sm">
-                  The SDK requires <code className="text-[#7C3AED] font-mono text-xs">@mysten/sui</code> v2.x as a peer dependency. If your project already has it, no additional install is needed.
+                  The SDK requires <code className="text-[#2563EB] font-mono text-xs">@mysten/sui</code> v2.x as a peer dependency. If your project already has it, no additional install is needed.
                 </p>
               </Step>
               <Step n={2} title="Ensure your tsconfig is compatible">
                 <p className="mb-3 text-sm">
-                  The Sui SDK v2 uses modern ESM-style type declarations. Add these to your <code className="text-[#7C3AED] font-mono text-xs">tsconfig.json</code>:
+                  The Sui SDK v2 uses modern ESM-style type declarations. Add these to your <code className="text-[#2563EB] font-mono text-xs">tsconfig.json</code>:
                 </p>
                 <CodeBlock lang="json" code={`{
   "compilerOptions": {
@@ -161,7 +161,7 @@ export default function SDKPage() {
 
             <Section id="init" title="Initialization">
               <p className="mb-4">
-                Create a single <code className="text-[#7C3AED] font-mono text-xs">FlowClient</code> instance and pass it to your components via context or props. It does not hold any wallet state — transaction signing is handled by your wallet adapter.
+                Create a single <code className="text-[#2563EB] font-mono text-xs">FlowClient</code> instance and pass it to your components via context or props. It does not hold any wallet state — transaction signing is handled by your wallet adapter.
               </p>
               <CodeBlock code={`import { FlowClient } from "@flow-protocol/sdk";
 
@@ -174,7 +174,7 @@ const flow = new FlowClient({
   rpcUrl: "https://rpc-testnet.suiscan.xyz",
 });`} />
               <p className="mt-4 text-sm">
-                The client exposes three namespaces: <code className="text-[#7C3AED] font-mono text-xs">flow.stream</code>, <code className="text-[#7C3AED] font-mono text-xs">flow.pact</code>, and <code className="text-[#7C3AED] font-mono text-xs">flow.instant</code>. Each method returns a <code className="text-[#7C3AED] font-mono text-xs">Transaction</code> object that you sign and execute using your wallet.
+                The client exposes three namespaces: <code className="text-[#2563EB] font-mono text-xs">flow.stream</code>, <code className="text-[#2563EB] font-mono text-xs">flow.pact</code>, and <code className="text-[#2563EB] font-mono text-xs">flow.instant</code>. Each method returns a <code className="text-[#2563EB] font-mono text-xs">Transaction</code> object that you sign and execute using your wallet.
               </p>
             </Section>
 
@@ -258,7 +258,7 @@ signAndExecute({ transaction: tx });`} />
 });
 signAndExecute({ transaction: tx });`} />
               </Step>
-              <div className="mt-2 p-4 rounded-xl border border-[#1A1A2E] bg-[#0D0D1A]">
+              <div className="mt-2 p-4 rounded-xl border border-[#0F1E3D] bg-[#080E1E]">
                 <p className="text-sm font-semibold text-white mb-3">Pact Status Values</p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
@@ -278,7 +278,7 @@ signAndExecute({ transaction: tx });`} />
 
             <Section id="instant" title="Instant Payments">
               <p className="mb-6">
-                Instant payments transfer tokens immediately. Use <code className="text-[#7C3AED] font-mono text-xs">send</code> for a single recipient or <code className="text-[#7C3AED] font-mono text-xs">splitSend</code> to distribute across multiple addresses in one transaction.
+                Instant payments transfer tokens immediately. Use <code className="text-[#2563EB] font-mono text-xs">send</code> for a single recipient or <code className="text-[#2563EB] font-mono text-xs">splitSend</code> to distribute across multiple addresses in one transaction.
               </p>
               <Step n={1} title="Send to a single recipient">
                 <CodeBlock code={`const tx = flow.instant.send({
@@ -310,28 +310,28 @@ signAndExecute({ transaction: tx });`} />
 
             <Section id="coins" title="Supported Assets">
               <p className="mb-4">
-                All three primitives are generic — any coin type on Sui works. Pass the full coin type string as <code className="text-[#7C3AED] font-mono text-xs">coinType</code>.
+                All three primitives are generic — any coin type on Sui works. Pass the full coin type string as <code className="text-[#2563EB] font-mono text-xs">coinType</code>.
               </p>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="border-b border-[#1A1A2E]">
+                    <tr className="border-b border-[#0F1E3D]">
                       <th className="text-left py-3 pr-6 text-[#6B7280] font-medium">Asset</th>
                       <th className="text-left py-3 text-[#6B7280] font-medium">Coin Type</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#1A1A2E]">
+                  <tbody className="divide-y divide-[#0F1E3D]">
                     <tr>
                       <td className="py-3 pr-6 font-semibold text-white">SUI</td>
-                      <td className="py-3 font-mono text-xs text-[#7C3AED]">0x2::sui::SUI</td>
+                      <td className="py-3 font-mono text-xs text-[#2563EB]">0x2::sui::SUI</td>
                     </tr>
                     <tr>
                       <td className="py-3 pr-6 font-semibold text-white">USDC</td>
-                      <td className="py-3 font-mono text-xs text-[#7C3AED] break-all">0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN</td>
+                      <td className="py-3 font-mono text-xs text-[#2563EB] break-all">0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN</td>
                     </tr>
                     <tr>
                       <td className="py-3 pr-6 font-semibold text-white">USDT</td>
-                      <td className="py-3 font-mono text-xs text-[#7C3AED] break-all">0xc060006111016b8a020ad5b33834984a437aaa7d3c74c18e09a95d48aceab08c::coin::COIN</td>
+                      <td className="py-3 font-mono text-xs text-[#2563EB] break-all">0xc060006111016b8a020ad5b33834984a437aaa7d3c74c18e09a95d48aceab08c::coin::COIN</td>
                     </tr>
                   </tbody>
                 </table>
@@ -341,11 +341,11 @@ signAndExecute({ transaction: tx });`} />
 
             <Section id="reference" title="Contract Reference">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="p-5 rounded-xl border border-[#1A1A2E] bg-[#0D0D1A]">
+                <div className="p-5 rounded-xl border border-[#0F1E3D] bg-[#080E1E]">
                   <p className="text-xs text-[#6B7280] mb-1">Package ID</p>
-                  <p className="font-mono text-xs text-[#7C3AED] break-all">{PACKAGE_ID}</p>
+                  <p className="font-mono text-xs text-[#2563EB] break-all">{PACKAGE_ID}</p>
                 </div>
-                <div className="p-5 rounded-xl border border-[#1A1A2E] bg-[#0D0D1A]">
+                <div className="p-5 rounded-xl border border-[#0F1E3D] bg-[#080E1E]">
                   <p className="text-xs text-[#6B7280] mb-1">Network</p>
                   <p className="font-mono text-sm text-[#10B981]">Sui Testnet</p>
                   <p className="text-xs text-[#6B7280] mt-2">Mainnet coming after audit</p>
@@ -354,26 +354,26 @@ signAndExecute({ transaction: tx });`} />
               <div className="overflow-x-auto">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="border-b border-[#1A1A2E]">
+                    <tr className="border-b border-[#0F1E3D]">
                       <th className="text-left py-3 pr-6 text-[#6B7280] font-medium">Module</th>
                       <th className="text-left py-3 pr-6 text-[#6B7280] font-medium">Object Type</th>
                       <th className="text-left py-3 text-[#6B7280] font-medium">Functions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#1A1A2E]">
+                  <tbody className="divide-y divide-[#0F1E3D]">
                     <tr>
                       <td className="py-3 pr-6 font-mono text-xs text-white">stream</td>
-                      <td className="py-3 pr-6 font-mono text-xs text-[#7C3AED]">Stream&lt;T&gt;</td>
+                      <td className="py-3 pr-6 font-mono text-xs text-[#2563EB]">Stream&lt;T&gt;</td>
                       <td className="py-3 text-xs text-[#6B7280]">create_stream, withdraw_stream, cancel_stream, get_claimable</td>
                     </tr>
                     <tr>
                       <td className="py-3 pr-6 font-mono text-xs text-white">pact</td>
-                      <td className="py-3 pr-6 font-mono text-xs text-[#7C3AED]">Pact&lt;T&gt;</td>
+                      <td className="py-3 pr-6 font-mono text-xs text-[#2563EB]">Pact&lt;T&gt;</td>
                       <td className="py-3 text-xs text-[#6B7280]">create_pact, complete_pact, cancel_pact, dispute_pact</td>
                     </tr>
                     <tr>
                       <td className="py-3 pr-6 font-mono text-xs text-white">instant</td>
-                      <td className="py-3 pr-6 font-mono text-xs text-[#7C3AED]">—</td>
+                      <td className="py-3 pr-6 font-mono text-xs text-[#2563EB]">—</td>
                       <td className="py-3 text-xs text-[#6B7280]">send, split_send</td>
                     </tr>
                   </tbody>
@@ -381,16 +381,16 @@ signAndExecute({ transaction: tx });`} />
               </div>
             </Section>
 
-            <div className="mt-4 p-6 rounded-2xl border border-[#7C3AED]/30 bg-[#7C3AED]/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="mt-4 p-6 rounded-2xl border border-[#2563EB]/30 bg-[#2563EB]/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <p className="text-white font-semibold mb-1">Ready to integrate?</p>
                 <p className="text-sm text-[#6B7280]">Try the live app or browse the source on GitHub.</p>
               </div>
               <div className="flex gap-3">
-                <Link href="/app" className="px-4 py-2 rounded-lg bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6D28D9] transition-colors">
+                <Link href="/app" className="px-4 py-2 rounded-lg bg-[#2563EB] text-white text-sm font-medium hover:bg-[#1D4ED8] transition-colors">
                   Open App
                 </Link>
-                <a href="https://github.com/softalpha0/Flow_Protocol" target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-lg border border-[#1A1A2E] text-sm font-medium text-[#A1A1AA] hover:text-white hover:border-[#374151] transition-colors">
+                <a href="https://github.com/softalpha0/Flow_Protocol" target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-lg border border-[#0F1E3D] text-sm font-medium text-[#A1A1AA] hover:text-white hover:border-[#374151] transition-colors">
                   GitHub
                 </a>
               </div>

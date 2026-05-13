@@ -20,7 +20,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#1A1A2E] bg-[#08080F]/90 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#0F1E3D] bg-[#060B18]/90 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <Image src="/logo.png" alt="Flow" width={32} height={32} className="rounded-sm" />
@@ -41,7 +41,7 @@ export default function Navbar() {
         </button>
       </div>
       {open && (
-        <div className="md:hidden border-t border-[#1A1A2E] bg-[#08080F] px-6 py-4 flex flex-col gap-4">
+        <div className="md:hidden border-t border-[#0F1E3D] bg-[#060B18] px-6 py-4 flex flex-col gap-4">
           <Link href="/app" onClick={() => setOpen(false)} className="text-sm text-[#6B7280] hover:text-white">Dashboard</Link>
           <Link href="/app/stream/new" onClick={() => setOpen(false)} className="text-sm text-[#6B7280] hover:text-white">Stream</Link>
           <Link href="/app/pact/new" onClick={() => setOpen(false)} className="text-sm text-[#6B7280] hover:text-white">Pact</Link>

@@ -98,7 +98,7 @@ export default function Send() {
 
   if (!account) {
     return (
-      <main className="min-h-screen bg-[#08080F]">
+      <main className="min-h-screen bg-[#060B18]">
         <Navbar />
         <div className="max-w-6xl mx-auto px-6 pt-40 text-center">
           <p className="text-[#6B7280]">Connect your wallet first.</p>
@@ -108,7 +108,7 @@ export default function Send() {
   }
 
   return (
-    <main className="min-h-screen bg-[#08080F]">
+    <main className="min-h-screen bg-[#060B18]">
       <Navbar />
       <div className="max-w-lg mx-auto px-6 pt-28 pb-16">
         <h1 className="text-2xl font-bold mb-2">Send</h1>
@@ -124,8 +124,8 @@ export default function Send() {
                   onClick={() => setCoinType(opt.value)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     coinType === opt.value
-                      ? "bg-[#7C3AED] text-white"
-                      : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
+                      ? "bg-[#2563EB] text-white"
+                      : "bg-[#0F0F1A] border border-[#0F1E3D] text-[#6B7280] hover:text-white"
                   }`}
                 >
                   {opt.label}
@@ -139,8 +139,8 @@ export default function Send() {
               onClick={() => setMode("single")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 mode === "single"
-                  ? "bg-[#1A1A2E] text-white border border-[#7C3AED]"
-                  : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
+                  ? "bg-[#0F1E3D] text-white border border-[#2563EB]"
+                  : "bg-[#0F0F1A] border border-[#0F1E3D] text-[#6B7280] hover:text-white"
               }`}
             >
               Single
@@ -149,8 +149,8 @@ export default function Send() {
               onClick={() => setMode("split")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 mode === "split"
-                  ? "bg-[#1A1A2E] text-white border border-[#7C3AED]"
-                  : "bg-[#0F0F1A] border border-[#1A1A2E] text-[#6B7280] hover:text-white"
+                  ? "bg-[#0F1E3D] text-white border border-[#2563EB]"
+                  : "bg-[#0F0F1A] border border-[#0F1E3D] text-[#6B7280] hover:text-white"
               }`}
             >
               Split
@@ -166,7 +166,7 @@ export default function Send() {
                   value={singleRecipient}
                   onChange={(e) => setSingleRecipient(e.target.value)}
                   placeholder="0x..."
-                  className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] font-mono"
+                  className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] font-mono"
                 />
               </div>
               <div>
@@ -179,7 +179,7 @@ export default function Send() {
                     placeholder="1.0"
                     step="0.01"
                     min="0"
-                    className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] pr-16"
+                    className="w-full px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] pr-16"
                   />
                   <span className="absolute right-4 top-3 text-sm text-[#6B7280]">{coinLabel}</span>
                 </div>
@@ -196,7 +196,7 @@ export default function Send() {
                       value={r.address}
                       onChange={(e) => updateRecipient(i, "address", e.target.value)}
                       placeholder="0x..."
-                      className="flex-1 px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] font-mono"
+                      className="flex-1 px-4 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] font-mono"
                     />
                     <div className="relative">
                       <input
@@ -206,7 +206,7 @@ export default function Send() {
                         placeholder="0.0"
                         step="0.01"
                         min="0"
-                        className="w-28 px-3 py-3 rounded-lg bg-[#0F0F1A] border border-[#1A1A2E] text-sm focus:outline-none focus:border-[#7C3AED] pr-10"
+                        className="w-28 px-3 py-3 rounded-lg bg-[#0F0F1A] border border-[#0F1E3D] text-sm focus:outline-none focus:border-[#2563EB] pr-10"
                       />
                       <span className="absolute right-3 top-3 text-xs text-[#6B7280]">{coinLabel}</span>
                     </div>
@@ -223,7 +223,7 @@ export default function Send() {
               ))}
               <button
                 onClick={addRecipient}
-                className="text-sm text-[#A78BFA] hover:text-[#7C3AED] transition-colors"
+                className="text-sm text-[#A78BFA] hover:text-[#2563EB] transition-colors"
               >
                 + Add recipient
               </button>
@@ -243,7 +243,7 @@ export default function Send() {
           <button
             onClick={handleSend}
             disabled={isPending}
-            className="w-full py-3 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors"
+            className="w-full py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors"
           >
             {isPending ? "Sending..." : "Send"}
           </button>

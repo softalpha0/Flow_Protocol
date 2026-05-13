@@ -99,7 +99,7 @@ export default function StreamDetail() {
     : "0";
 
   return (
-    <main className="min-h-screen bg-[#08080F]">
+    <main className="min-h-screen bg-[#060B18]">
       <Navbar />
       <div className="max-w-lg mx-auto px-6 pt-28 pb-16">
         <div className="flex items-center gap-2 mb-6">
@@ -115,7 +115,7 @@ export default function StreamDetail() {
 
         {fields && (
           <div className="space-y-4">
-            <div className="p-6 rounded-xl border border-[#1A1A2E] bg-[#0F0F1A] space-y-3">
+            <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">From</span>
                 <span className="font-mono">{shortenAddress(fields.sender)}</span>
@@ -135,7 +135,7 @@ export default function StreamDetail() {
             </div>
 
             {isActive && (
-              <div className="p-6 rounded-xl border border-[#7C3AED40] bg-[#1E1040] text-center">
+              <div className="p-6 rounded-xl border border-[#2563EB40] bg-[#1E1040] text-center">
                 <p className="text-xs text-[#A78BFA] mb-1 uppercase tracking-wide">Claimable now</p>
                 <p className="text-4xl font-bold font-mono">{mistToSui(claimable)}</p>
                 <p className="text-xs text-[#6B7280] mt-1">Updates every second</p>
@@ -150,7 +150,7 @@ export default function StreamDetail() {
                 <button
                   onClick={handleWithdraw}
                   disabled={isPending || claimable === 0n}
-                  className="flex-1 py-3 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-50 font-medium text-sm transition-colors"
+                  className="flex-1 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 font-medium text-sm transition-colors"
                 >
                   {isPending ? "Processing..." : "Withdraw"}
                 </button>

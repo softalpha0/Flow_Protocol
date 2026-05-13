@@ -139,7 +139,7 @@ export default function PactDetail() {
   const deadlineDate = deadlineMs > 0 ? new Date(deadlineMs).toLocaleString() : "None";
 
   return (
-    <main className="min-h-screen bg-[#08080F]">
+    <main className="min-h-screen bg-[#060B18]">
       <Navbar />
       <div className="max-w-lg mx-auto px-6 pt-28 pb-16">
         <div className="flex items-center gap-2 mb-6">
@@ -155,7 +155,7 @@ export default function PactDetail() {
 
         {fields && (
           <div className="space-y-4">
-            <div className="p-6 rounded-xl border border-[#1A1A2E] bg-[#0F0F1A] space-y-3">
+            <div className="p-6 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A] space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">From</span>
                 <span className="font-mono">{shortenAddress(fields.sender)}</span>
@@ -175,17 +175,17 @@ export default function PactDetail() {
             </div>
 
             {fields.description && (
-              <div className="p-4 rounded-xl border border-[#1A1A2E] bg-[#0F0F1A]">
+              <div className="p-4 rounded-xl border border-[#0F1E3D] bg-[#0F0F1A]">
                 <p className="text-xs text-[#6B7280] mb-1 uppercase tracking-wide">Summary</p>
                 <p className="text-sm">{fields.description}</p>
               </div>
             )}
 
             {walrusBlobId && (
-              <div className="p-4 rounded-xl border border-[#7C3AED]/30 bg-[#7C3AED]/5">
+              <div className="p-4 rounded-xl border border-[#2563EB]/30 bg-[#2563EB]/5">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
@@ -196,7 +196,7 @@ export default function PactDetail() {
                     href={walrusBlobUrl(walrusBlobId)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[#7C3AED] hover:underline"
+                    className="text-xs text-[#2563EB] hover:underline"
                   >
                     Open raw
                   </a>
@@ -243,7 +243,7 @@ export default function PactDetail() {
                     <button
                       onClick={handleComplete}
                       disabled={isPending}
-                      className="flex-1 py-3 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-50 font-medium text-sm transition-colors"
+                      className="flex-1 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 font-medium text-sm transition-colors"
                     >
                       {isPending ? "Processing..." : "Release Funds"}
                     </button>

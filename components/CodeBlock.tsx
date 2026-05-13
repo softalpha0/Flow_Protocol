@@ -13,8 +13,8 @@ export default function CodeBlock({ code, lang = "typescript" }: { code: string;
   }
 
   return (
-    <div className="rounded-xl border border-[#1A1A2E] bg-[#0D0D1A] overflow-x-auto">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[#1A1A2E]">
+    <div className="rounded-xl border border-[#0F1E3D] bg-[#080E1E] overflow-x-auto">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-[#0F1E3D]">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
           <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
@@ -23,7 +23,7 @@ export default function CodeBlock({ code, lang = "typescript" }: { code: string;
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs text-[#6B7280] hover:text-white hover:bg-[#1A1A2E] transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs text-[#6B7280] hover:text-white hover:bg-[#0F1E3D] transition-colors"
         >
           {copied ? (
             <>

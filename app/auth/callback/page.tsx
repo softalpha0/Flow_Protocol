@@ -36,7 +36,7 @@ export default function AuthCallback() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#08080F] flex items-center justify-center">
+    <main className="min-h-screen bg-[#060B18] flex items-center justify-center">
       <div className="text-center px-6">
         {error ? (
           <div>
@@ -47,7 +47,7 @@ export default function AuthCallback() {
           </div>
         ) : (
           <div>
-            <div className="w-8 h-8 border-2 border-[#7C3AED] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-[#6B7280] text-sm">{status}</p>
             <p className="text-xs text-[#374151] mt-2">Fetching ZK proof from Mysten prover...</p>
           </div>
