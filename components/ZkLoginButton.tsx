@@ -1,25 +1,86 @@
 "use client";
 
-import { useSuiClient } from "@mysten/dapp-kit";
+import { useState, useRef, useEffect } from "react";
+import { useSuiClient, useSuiClientQuery } from "@mysten/dapp-kit";
 import { beginZkLogin } from "@/lib/zklogin";
 import { useZkLogin } from "@/contexts/ZkLoginContext";
+
+function formatSui(mist: bigint): string {
+  const sui = Number(mist) / 1_000_000_000;
+  return sui.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+}
 
 export default function ZkLoginButton() {
   const suiClient = useSuiClient();
   const { session, logout } = useZkLogin();
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const { data: balanceData } = useSuiClientQuery(
+    "getBalance",
+    { owner: session?.address ?? "" },
+    { enabled: !!session?.address }
+  );
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  function copyAddress() {
+    if (!session) return;
+    navigator.clipboard.writeText(session.address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   if (session) {
+    const balance = balanceData ? formatSui(BigInt(balanceData.totalBalance)) : "—";
+    const short = `${session.address.slice(0, 6)}...${session.address.slice(-4)}`;
+
     return (
-      <div className="flex items-center gap-3">
-        <span className="text-xs text-[#6B7280] font-mono">
-          {session.address.slice(0, 6)}...{session.address.slice(-4)}
-        </span>
+      <div className="relative" ref={ref}>
         <button
-          onClick={logout}
-          className="text-xs text-[#EF4444] hover:text-red-400 transition-colors"
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors"
         >
-          Sign out
+          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#2563EB] to-[#38BDF8] flex-shrink-0" />
+          <span className="text-xs font-mono text-[#111827]">{short}</span>
+          <svg className={`w-3 h-3 text-[#6B7280] transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
         </button>
+
+        {open && (
+          <div className="absolute right-0 mt-2 w-72 rounded-xl border border-[#E2E8F0] bg-white shadow-lg z-50 overflow-hidden">
+            <div className="p-4 border-b border-[#E2E8F0]">
+              <p className="text-xs text-[#6B7280] mb-1">SUI Balance</p>
+              <p className="text-2xl font-bold text-[#111827]">{balance} <span className="text-sm font-normal text-[#6B7280]">SUI</span></p>
+            </div>
+            <div className="p-4 border-b border-[#E2E8F0]">
+              <p className="text-xs text-[#6B7280] mb-1">Address</p>
+              <p className="font-mono text-xs text-[#111827] break-all">{session.address}</p>
+              <button
+                onClick={copyAddress}
+                className="mt-2 text-xs text-[#2563EB] hover:underline"
+              >
+                {copied ? "Copied!" : "Copy address"}
+              </button>
+            </div>
+            <div className="p-3">
+              <button
+                onClick={() => { logout(); setOpen(false); }}
+                className="w-full text-sm text-[#EF4444] hover:bg-red-50 py-2 rounded-lg transition-colors"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
