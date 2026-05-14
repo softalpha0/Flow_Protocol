@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   const jwt = body.jwt as string;
   const apiKey = process.env.ENOKI_API_KEY ?? "";
 
-  console.log("[zklogin/proof] request — maxEpoch:", body.maxEpoch);
+  console.log("[zklogin/proof] request — maxEpoch:", body.maxEpoch, "hasEnokiKey:", apiKey.length > 0);
 
   if (apiKey) {
     const res = await fetch(`${ENOKI_API}/v1/zklogin/zkp`, {
