@@ -22,7 +22,7 @@ export default function Home() {
             Flow is a programmable payments protocol on Sui. Stream any asset by the second, lock funds in milestone escrow, or split payments across a team — all onchain, non-custodial, with any token.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link href="/app" className="px-6 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-[#111827] font-medium text-sm transition-colors">
+            <Link href="/app" className="px-6 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm transition-colors">
               Launch App
             </Link>
             <Link href="/app/stream/new" className="px-6 py-3 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#111827] font-medium text-sm transition-colors">
@@ -212,7 +212,7 @@ export default function Home() {
               Flow is live on Sui testnet. Try streaming, creating a pact, or integrating the SDK into your app today.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
-              <Link href="/app" className="px-6 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-[#111827] font-medium text-sm transition-colors">
+              <Link href="/app" className="px-6 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm transition-colors">
                 Open App
               </Link>
               <a href="https://github.com/softalpha0/Flow_Protocol" target="_blank" rel="noopener noreferrer" className="px-6 py-3 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#111827] font-medium text-sm transition-colors">

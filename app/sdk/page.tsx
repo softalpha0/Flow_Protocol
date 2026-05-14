@@ -40,7 +40,7 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 
 export default function SDKPage() {
   return (
-    <div className="min-h-screen bg-[#FFFFFF] text-[#A1A1AA]">
+    <div className="min-h-screen bg-[#FFFFFF] text-[#374151]">
       <div className="max-w-7xl mx-auto px-6 pt-28 pb-24">
         <div className="flex gap-12">
           <aside className="hidden lg:block w-56 flex-shrink-0">
@@ -387,10 +387,10 @@ signAndExecute({ transaction: tx });`} />
                 <p className="text-sm text-[#6B7280]">Try the live app or browse the source on GitHub.</p>
               </div>
               <div className="flex gap-3">
-                <Link href="/app" className="px-4 py-2 rounded-lg bg-[#2563EB] text-[#111827] text-sm font-medium hover:bg-[#1D4ED8] transition-colors">
+                <Link href="/app" className="px-4 py-2 rounded-lg bg-[#2563EB] text-white text-sm font-medium hover:bg-[#1D4ED8] transition-colors">
                   Open App
                 </Link>
-                <a href="https://github.com/softalpha0/Flow_Protocol" target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-sm font-medium text-[#A1A1AA] hover:text-[#111827] hover:border-[#374151] transition-colors">
+                <a href="https://github.com/softalpha0/Flow_Protocol" target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-sm font-medium text-[#374151] hover:text-[#111827] hover:border-[#374151] transition-colors">
                   GitHub
                 </a>
               </div>
