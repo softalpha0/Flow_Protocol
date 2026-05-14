@@ -2,7 +2,6 @@
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import { PACKAGE_ID } from "@/constants";
 import { mistToSui, shortenAddress } from "@/lib/sui";
 import { useZkLogin } from "@/contexts/ZkLoginContext";
@@ -18,53 +17,37 @@ type EventFields = {
   deadline?: string;
 };
 
+const STREAM_CREATED = `${PACKAGE_ID}::stream::StreamCreated`;
+const PACT_CREATED = `${PACKAGE_ID}::pact::PactCreated`;
+
 export default function Dashboard() {
   const account = useCurrentAccount();
   const { session } = useZkLogin();
   const activeAddress = account?.address ?? session?.address ?? null;
 
-  const { data: streamEvents } = useSuiClientQuery(
+  const { data: sentEvents } = useSuiClientQuery(
     "queryEvents",
     {
-      query: {
-        All: [
-          { MoveEventType: `${PACKAGE_ID}::stream::StreamCreated` },
-          { Sender: activeAddress! },
-        ] as never,
-      },
-      limit: 50,
+      query: { Sender: activeAddress! },
+      limit: 100,
     },
     { enabled: !!activeAddress }
   );
 
-  const { data: streamEventsReceived } = useSuiClientQuery(
+  const { data: globalStreamEvents } = useSuiClientQuery(
     "queryEvents",
     {
-      query: { MoveEventType: `${PACKAGE_ID}::stream::StreamCreated` },
-      limit: 50,
+      query: { MoveEventType: STREAM_CREATED },
+      limit: 100,
     },
     { enabled: !!activeAddress }
   );
 
-  const { data: pactEvents } = useSuiClientQuery(
+  const { data: globalPactEvents } = useSuiClientQuery(
     "queryEvents",
     {
-      query: {
-        All: [
-          { MoveEventType: `${PACKAGE_ID}::pact::PactCreated` },
-          { Sender: activeAddress! },
-        ] as never,
-      },
-      limit: 50,
-    },
-    { enabled: !!activeAddress }
-  );
-
-  const { data: pactEventsReceived } = useSuiClientQuery(
-    "queryEvents",
-    {
-      query: { MoveEventType: `${PACKAGE_ID}::pact::PactCreated` },
-      limit: 50,
+      query: { MoveEventType: PACT_CREATED },
+      limit: 100,
     },
     { enabled: !!activeAddress }
   );
@@ -80,33 +63,29 @@ export default function Dashboard() {
     );
   }
 
-  const allStreamEvents = [
-    ...(streamEvents?.data ?? []),
-    ...(streamEventsReceived?.data ?? []).filter((e) => {
-      const f = e.parsedJson as EventFields;
-      return f?.recipient === activeAddress;
-    }),
-  ];
-  const seenStreamIds = new Set<string>();
-  const myStreams = allStreamEvents.filter((e) => {
+  const sentStreams = (sentEvents?.data ?? []).filter(e => e.type === STREAM_CREATED);
+  const receivedStreams = (globalStreamEvents?.data ?? []).filter(e => {
+    const f = e.parsedJson as EventFields;
+    return f?.recipient === activeAddress;
+  });
+  const seenStreamKeys = new Set<string>();
+  const myStreams = [...sentStreams, ...receivedStreams].filter(e => {
     const key = e.id.txDigest + e.id.eventSeq;
-    if (seenStreamIds.has(key)) return false;
-    seenStreamIds.add(key);
+    if (seenStreamKeys.has(key)) return false;
+    seenStreamKeys.add(key);
     return true;
   });
 
-  const allPactEvents = [
-    ...(pactEvents?.data ?? []),
-    ...(pactEventsReceived?.data ?? []).filter((e) => {
-      const f = e.parsedJson as EventFields;
-      return f?.recipient === activeAddress;
-    }),
-  ];
-  const seenPactIds = new Set<string>();
-  const myPacts = allPactEvents.filter((e) => {
+  const sentPacts = (sentEvents?.data ?? []).filter(e => e.type === PACT_CREATED);
+  const receivedPacts = (globalPactEvents?.data ?? []).filter(e => {
+    const f = e.parsedJson as EventFields;
+    return f?.recipient === activeAddress;
+  });
+  const seenPactKeys = new Set<string>();
+  const myPacts = [...sentPacts, ...receivedPacts].filter(e => {
     const key = e.id.txDigest + e.id.eventSeq;
-    if (seenPactIds.has(key)) return false;
-    seenPactIds.add(key);
+    if (seenPactKeys.has(key)) return false;
+    seenPactKeys.add(key);
     return true;
   });
 
