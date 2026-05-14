@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
           randomness: body.jwtRandomness,
           maxEpoch: body.maxEpoch,
           jwtRandomness: body.jwtRandomness,
-          extendedEphemeralPublicKey: body.extendedEphemeralPublicKey,
+          ephemeralPublicKey: body.extendedEphemeralPublicKey,
           salt: body.salt,
           keyClaimName: body.keyClaimName ?? "sub",
         }),
