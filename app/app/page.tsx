@@ -26,8 +26,22 @@ export default function Dashboard() {
   const { data: streamEvents } = useSuiClientQuery(
     "queryEvents",
     {
+      query: {
+        All: [
+          { MoveEventType: `${PACKAGE_ID}::stream::StreamCreated` },
+          { Sender: activeAddress! },
+        ],
+      },
+      limit: 50,
+    },
+    { enabled: !!activeAddress }
+  );
+
+  const { data: streamEventsReceived } = useSuiClientQuery(
+    "queryEvents",
+    {
       query: { MoveEventType: `${PACKAGE_ID}::stream::StreamCreated` },
-      limit: 20,
+      limit: 50,
     },
     { enabled: !!activeAddress }
   );
@@ -35,8 +49,22 @@ export default function Dashboard() {
   const { data: pactEvents } = useSuiClientQuery(
     "queryEvents",
     {
+      query: {
+        All: [
+          { MoveEventType: `${PACKAGE_ID}::pact::PactCreated` },
+          { Sender: activeAddress! },
+        ],
+      },
+      limit: 50,
+    },
+    { enabled: !!activeAddress }
+  );
+
+  const { data: pactEventsReceived } = useSuiClientQuery(
+    "queryEvents",
+    {
       query: { MoveEventType: `${PACKAGE_ID}::pact::PactCreated` },
-      limit: 20,
+      limit: 50,
     },
     { enabled: !!activeAddress }
   );
@@ -52,15 +80,35 @@ export default function Dashboard() {
     );
   }
 
-  const myStreams = streamEvents?.data?.filter((e) => {
-    const f = e.parsedJson as EventFields;
-    return f?.sender === activeAddress || f?.recipient === activeAddress;
-  }) ?? [];
+  const allStreamEvents = [
+    ...(streamEvents?.data ?? []),
+    ...(streamEventsReceived?.data ?? []).filter((e) => {
+      const f = e.parsedJson as EventFields;
+      return f?.recipient === activeAddress;
+    }),
+  ];
+  const seenStreamIds = new Set<string>();
+  const myStreams = allStreamEvents.filter((e) => {
+    const key = e.id.txDigest + e.id.eventSeq;
+    if (seenStreamIds.has(key)) return false;
+    seenStreamIds.add(key);
+    return true;
+  });
 
-  const myPacts = pactEvents?.data?.filter((e) => {
-    const f = e.parsedJson as EventFields;
-    return f?.sender === activeAddress || f?.recipient === activeAddress;
-  }) ?? [];
+  const allPactEvents = [
+    ...(pactEvents?.data ?? []),
+    ...(pactEventsReceived?.data ?? []).filter((e) => {
+      const f = e.parsedJson as EventFields;
+      return f?.recipient === activeAddress;
+    }),
+  ];
+  const seenPactIds = new Set<string>();
+  const myPacts = allPactEvents.filter((e) => {
+    const key = e.id.txDigest + e.id.eventSeq;
+    if (seenPactIds.has(key)) return false;
+    seenPactIds.add(key);
+    return true;
+  });
 
   return (
     <main className="min-h-screen bg-white">
