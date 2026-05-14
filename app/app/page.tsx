@@ -30,7 +30,7 @@ export default function Dashboard() {
         All: [
           { MoveEventType: `${PACKAGE_ID}::stream::StreamCreated` },
           { Sender: activeAddress! },
-        ],
+        ] as never,
       },
       limit: 50,
     },
@@ -53,7 +53,7 @@ export default function Dashboard() {
         All: [
           { MoveEventType: `${PACKAGE_ID}::pact::PactCreated` },
           { Sender: activeAddress! },
-        ],
+        ] as never,
       },
       limit: 50,
     },
