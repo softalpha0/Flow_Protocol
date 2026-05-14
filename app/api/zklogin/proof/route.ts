@@ -11,32 +11,46 @@ export async function POST(req: NextRequest) {
   console.log("[zklogin/proof] request — maxEpoch:", body.maxEpoch, "hasEnokiKey:", apiKey.length > 0);
 
   if (apiKey) {
-    const res = await fetch(`${ENOKI_API}/v1/zklogin/zkp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-        "zklogin-jwt": jwt,
-      },
-      body: JSON.stringify({
-        network: "testnet",
-        randomness: body.jwtRandomness,
-        maxEpoch: body.maxEpoch,
-        jwtRandomness: body.jwtRandomness,
-        extendedEphemeralPublicKey: body.extendedEphemeralPublicKey,
-        salt: body.salt,
-        keyClaimName: body.keyClaimName ?? "sub",
-      }),
-    });
+    try {
+      const res = await fetch(`${ENOKI_API}/v1/zklogin/zkp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+          "zklogin-jwt": jwt,
+        },
+        body: JSON.stringify({
+          network: "testnet",
+          randomness: body.jwtRandomness,
+          maxEpoch: body.maxEpoch,
+          jwtRandomness: body.jwtRandomness,
+          extendedEphemeralPublicKey: body.extendedEphemeralPublicKey,
+          salt: body.salt,
+          keyClaimName: body.keyClaimName ?? "sub",
+        }),
+      });
 
-    const data = await res.json() as Record<string, unknown>;
-    console.log("[zklogin/proof] Enoki status:", res.status, "keys:", Object.keys(data));
+      const data = await res.json() as Record<string, unknown>;
+      console.log("[zklogin/proof] Enoki status:", res.status, "keys:", Object.keys(data));
 
-    const proof = data.data as Record<string, unknown> | undefined;
-    if (res.ok && proof?.proofPoints) {
-      return NextResponse.json(proof, { status: 200 });
+      if (!res.ok) {
+        console.error("[zklogin/proof] Enoki error body:", JSON.stringify(data));
+        return NextResponse.json({ error: "Enoki prover failed", detail: JSON.stringify(data) }, { status: 500 });
+      }
+
+      const proof = (data.data ?? data) as Record<string, unknown>;
+      console.log("[zklogin/proof] proof keys:", Object.keys(proof));
+
+      if (proof.proofPoints) {
+        return NextResponse.json(proof, { status: 200 });
+      }
+
+      console.error("[zklogin/proof] Enoki returned ok but no proofPoints:", JSON.stringify(data));
+      return NextResponse.json({ error: "Enoki returned no proofPoints", detail: JSON.stringify(data) }, { status: 500 });
+    } catch (e) {
+      console.error("[zklogin/proof] Enoki threw:", String(e));
+      return NextResponse.json({ error: "Enoki request failed", detail: String(e) }, { status: 500 });
     }
-    console.error("[zklogin/proof] Enoki failed:", JSON.stringify(data));
   }
 
   const proverBody = { ...body, network: "testnet" };
