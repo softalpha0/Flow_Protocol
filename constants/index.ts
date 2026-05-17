@@ -1,4 +1,4 @@
-export const PACKAGE_ID = "0x3170c4670ac048b33460524a1ee6bad245f86bac32345e761257ff970540c94b";
+export const PACKAGE_ID = "0xce6f22134a8e66c4d43003163e06647bc91d55b9ed8b17c1f2358c2e0705b566";
 export const NETWORK = "testnet";
 export const MIST_PER_SUI = 1_000_000_000n;
 

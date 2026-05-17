@@ -35,6 +35,8 @@ export default function PactDetail() {
   const [walrusContent, setWalrusContent] = useState<string | null>(null);
   const [walrusLoading, setWalrusLoading] = useState(false);
   const [receiptBlobId, setReceiptBlobId] = useState<string | null>(null);
+  const [showStreamRelease, setShowStreamRelease] = useState(false);
+  const [streamDays, setStreamDays] = useState("30");
 
   const { data, isLoading, refetch } = useSuiClientQuery("getObject", {
     id,
@@ -105,6 +107,47 @@ export default function PactDetail() {
         {
           onSuccess: () => {
             setSuccess("Pact completed. Funds released.");
+            refetch();
+            generateAndUploadReceipt();
+          },
+          onError: (err) => setError(err.message),
+        }
+      );
+    }
+  }
+
+  async function handleReleaseAsStream() {
+    if (!activeAddress) return;
+    setError(""); setSuccess("");
+    const days = Number(streamDays);
+    if (!days || days <= 0) { setError("Enter a valid number of days."); return; }
+    const durationMs = BigInt(Math.floor(days * 24 * 60 * 60 * 1000));
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${PACKAGE_ID}::pact::complete_pact_as_stream`,
+      typeArguments: [coinType],
+      arguments: [tx.object(id), tx.pure.u64(durationMs), tx.object("0x6")],
+    });
+    if (session) {
+      setLoading(true);
+      try {
+        await execute(tx);
+        setSuccess(`Pact released as a ${days}-day stream to the recipient.`);
+        setShowStreamRelease(false);
+        refetch();
+        generateAndUploadReceipt();
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Transaction failed");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: () => {
+            setSuccess(`Pact released as a ${days}-day stream to the recipient.`);
+            setShowStreamRelease(false);
             refetch();
             generateAndUploadReceipt();
           },
@@ -282,22 +325,67 @@ export default function PactDetail() {
             {success && <p className="text-sm text-[#10B981] bg-[#10B98110] px-4 py-3 rounded-lg">{success}</p>}
 
             {isPending2 && (
-              <div className="flex gap-3">
+              <div className="space-y-3">
                 {isSender && (
                   <>
-                    <button
-                      onClick={handleComplete}
-                      disabled={isPending}
-                      className="flex-1 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white disabled:opacity-50 font-medium text-sm transition-colors"
-                    >
-                      {isPending ? "Processing..." : "Release Funds"}
-                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleComplete}
+                        disabled={isPending}
+                        className="flex-1 py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white disabled:opacity-50 font-medium text-sm transition-colors"
+                      >
+                        {isPending ? "Processing..." : "Release Funds"}
+                      </button>
+                      <button
+                        onClick={() => setShowStreamRelease((v) => !v)}
+                        disabled={isPending}
+                        className={`flex-1 py-3 rounded-lg border font-medium text-sm transition-colors disabled:opacity-50 ${showStreamRelease ? "border-[#2563EB] text-[#2563EB] bg-[#2563EB]/5" : "border-[#E2E8F0] text-[#374151] hover:border-[#2563EB]"}`}
+                      >
+                        Release as Stream
+                      </button>
+                    </div>
+
+                    {showStreamRelease && (
+                      <div className="p-4 rounded-xl border border-[#2563EB]/30 bg-[#2563EB]/5 space-y-3">
+                        <p className="text-xs text-[#374151]">
+                          Instead of a lump sum, funds will stream per-second to the recipient over the selected duration. One transaction — two primitives composing.
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <label className="block text-xs font-medium text-[#374151] mb-1">Stream duration (days)</label>
+                            <input
+                              type="number"
+                              value={streamDays}
+                              onChange={(e) => setStreamDays(e.target.value)}
+                              min="1"
+                              step="1"
+                              className="w-full px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#2563EB]"
+                            />
+                          </div>
+                          <div className="flex-1 pt-5">
+                            <p className="text-xs text-[#6B7280]">
+                              Rate: {fields?.amount && streamDays && Number(streamDays) > 0
+                                ? `${(Number(mistToSui(BigInt(fields.amount))) / (Number(streamDays) * 86400)).toFixed(8)} SUI/sec`
+                                : "—"}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleReleaseAsStream}
+                          disabled={isPending || !streamDays || Number(streamDays) <= 0}
+                          className="w-full py-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white disabled:opacity-50 font-medium text-sm transition-colors"
+                        >
+                          {isPending ? "Processing..." : "Confirm Stream Release"}
+                        </button>
+                      </div>
+                    )}
+
                     <button
                       onClick={handleCancel}
                       disabled={isPending}
-                      className="flex-1 py-3 rounded-lg border border-[#EF4444] text-[#EF4444] hover:bg-[#EF444410] disabled:opacity-50 font-medium text-sm transition-colors"
+                      className="w-full py-3 rounded-lg border border-[#EF4444] text-[#EF4444] hover:bg-[#EF444410] disabled:opacity-50 font-medium text-sm transition-colors"
                     >
-                      Cancel
+                      Cancel Pact
                     </button>
                   </>
                 )}
@@ -305,7 +393,7 @@ export default function PactDetail() {
                   <button
                     onClick={handleDispute}
                     disabled={isPending}
-                    className="flex-1 py-3 rounded-lg border border-[#F59E0B] text-[#F59E0B] hover:bg-[#F59E0B10] disabled:opacity-50 font-medium text-sm transition-colors"
+                    className="w-full py-3 rounded-lg border border-[#F59E0B] text-[#F59E0B] hover:bg-[#F59E0B10] disabled:opacity-50 font-medium text-sm transition-colors"
                   >
                     Raise Dispute
                   </button>

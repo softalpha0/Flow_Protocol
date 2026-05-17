@@ -7,6 +7,7 @@ module flow_protocol::pact {
     use sui::event;
     use sui::balance::{Self, Balance};
     use std::string::{Self, String};
+    use flow_protocol::stream;
 
     const STATUS_PENDING: u8 = 0;
     const STATUS_COMPLETED: u8 = 1;
@@ -17,6 +18,8 @@ module flow_protocol::pact {
     const ENotRecipient: u64 = 1;
     const EDeadlinePassed: u64 = 3;
     const ENotPending: u64 = 4;
+    const EZeroDuration: u64 = 5;
+    const EZeroRate: u64 = 6;
 
     public struct PactCreated has copy, drop {
         pact_id: address,
@@ -41,6 +44,13 @@ module flow_protocol::pact {
     public struct PactDisputed has copy, drop {
         pact_id: address,
         disputed_by: address,
+    }
+
+    public struct PactReleasedAsStream has copy, drop {
+        pact_id: address,
+        recipient: address,
+        amount: u64,
+        rate_per_second: u64,
     }
 
     public struct Pact<phantom T> has key, store {
@@ -118,6 +128,47 @@ module flow_protocol::pact {
         });
 
         transfer::public_transfer(coin::from_balance(payout, ctx), pact.recipient);
+    }
+
+    public fun complete_pact_as_stream<T>(
+        pact: &mut Pact<T>,
+        stream_duration_ms: u64,
+        clock: &Clock,
+        ctx: &mut TxContext
+    ) {
+        let caller = tx_context::sender(ctx);
+        assert!(caller == pact.sender, ENotSender);
+        assert!(pact.status == STATUS_PENDING, ENotPending);
+        assert!(stream_duration_ms > 0, EZeroDuration);
+
+        if (pact.deadline > 0) {
+            assert!(clock::timestamp_ms(clock) <= pact.deadline, EDeadlinePassed);
+        };
+
+        let amount = balance::value(&pact.balance);
+        let duration_sec = stream_duration_ms / 1000;
+        let rate_per_second = amount / duration_sec;
+        assert!(rate_per_second > 0, EZeroRate);
+
+        pact.status = STATUS_COMPLETED;
+
+        let payout = balance::split(&mut pact.balance, amount);
+        let deposit_coin = coin::from_balance(payout, ctx);
+
+        event::emit(PactReleasedAsStream {
+            pact_id: object::uid_to_address(&pact.id),
+            recipient: pact.recipient,
+            amount,
+            rate_per_second,
+        });
+
+        stream::create_stream(
+            pact.recipient,
+            rate_per_second,
+            deposit_coin,
+            clock,
+            ctx
+        );
     }
 
     public fun cancel_pact<T>(
