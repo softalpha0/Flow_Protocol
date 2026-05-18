@@ -6,6 +6,8 @@ import { PACKAGE_ID } from "@/constants";
 import { mistToSui, shortenAddress } from "@/lib/sui";
 import { useZkLogin } from "@/contexts/ZkLoginContext";
 
+const OLD_PACKAGE_ID = "0x3170c4670ac048b33460524a1ee6bad245f86bac32345e761257ff970540c94b";
+
 type EventFields = {
   stream_id?: string;
   pact_id?: string;
@@ -17,8 +19,8 @@ type EventFields = {
   deadline?: string;
 };
 
-const STREAM_CREATED = `${PACKAGE_ID}::stream::StreamCreated`;
-const PACT_CREATED = `${PACKAGE_ID}::pact::PactCreated`;
+const isStreamCreated = (type: string) => type.endsWith("::stream::StreamCreated");
+const isPactCreated = (type: string) => type.endsWith("::pact::PactCreated");
 
 export default function Dashboard() {
   const account = useCurrentAccount();
@@ -27,28 +29,31 @@ export default function Dashboard() {
 
   const { data: sentEvents } = useSuiClientQuery(
     "queryEvents",
-    {
-      query: { Sender: activeAddress! },
-      limit: 100,
-    },
+    { query: { Sender: activeAddress! }, limit: 100 },
     { enabled: !!activeAddress }
   );
 
   const { data: globalStreamEvents } = useSuiClientQuery(
     "queryEvents",
-    {
-      query: { MoveEventType: STREAM_CREATED },
-      limit: 100,
-    },
+    { query: { MoveEventType: `${PACKAGE_ID}::stream::StreamCreated` }, limit: 100 },
+    { enabled: !!activeAddress }
+  );
+
+  const { data: globalStreamEventsOld } = useSuiClientQuery(
+    "queryEvents",
+    { query: { MoveEventType: `${OLD_PACKAGE_ID}::stream::StreamCreated` }, limit: 100 },
     { enabled: !!activeAddress }
   );
 
   const { data: globalPactEvents } = useSuiClientQuery(
     "queryEvents",
-    {
-      query: { MoveEventType: PACT_CREATED },
-      limit: 100,
-    },
+    { query: { MoveEventType: `${PACKAGE_ID}::pact::PactCreated` }, limit: 100 },
+    { enabled: !!activeAddress }
+  );
+
+  const { data: globalPactEventsOld } = useSuiClientQuery(
+    "queryEvents",
+    { query: { MoveEventType: `${OLD_PACKAGE_ID}::pact::PactCreated` }, limit: 100 },
     { enabled: !!activeAddress }
   );
 
@@ -63,8 +68,12 @@ export default function Dashboard() {
     );
   }
 
-  const sentStreams = (sentEvents?.data ?? []).filter(e => e.type === STREAM_CREATED);
-  const receivedStreams = (globalStreamEvents?.data ?? []).filter(e => {
+  const sentStreams = (sentEvents?.data ?? []).filter(e => isStreamCreated(e.type));
+  const allGlobalStreams = [
+    ...(globalStreamEvents?.data ?? []),
+    ...(globalStreamEventsOld?.data ?? []),
+  ];
+  const receivedStreams = allGlobalStreams.filter(e => {
     const f = e.parsedJson as EventFields;
     return f?.recipient === activeAddress;
   });
@@ -76,8 +85,12 @@ export default function Dashboard() {
     return true;
   });
 
-  const sentPacts = (sentEvents?.data ?? []).filter(e => e.type === PACT_CREATED);
-  const receivedPacts = (globalPactEvents?.data ?? []).filter(e => {
+  const sentPacts = (sentEvents?.data ?? []).filter(e => isPactCreated(e.type));
+  const allGlobalPacts = [
+    ...(globalPactEvents?.data ?? []),
+    ...(globalPactEventsOld?.data ?? []),
+  ];
+  const receivedPacts = allGlobalPacts.filter(e => {
     const f = e.parsedJson as EventFields;
     return f?.recipient === activeAddress;
   });
