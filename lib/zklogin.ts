@@ -52,7 +52,7 @@ export function computeAddressSeed(salt: string, jwt: string): string {
 export async function beginZkLogin(suiClient: SuiClientLike) {
   const keypair = new Ed25519Keypair();
   const { epoch } = await suiClient.getLatestSuiSystemState();
-  const maxEpoch = Number(epoch) + 2;
+  const maxEpoch = Number(epoch) + 10;
   const randomness = generateRandomness();
   const nonce = generateNonce(keypair.getPublicKey(), maxEpoch, randomness);
 

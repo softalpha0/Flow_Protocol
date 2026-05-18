@@ -24,8 +24,20 @@ export function ZkLoginProvider({ children }: { children: React.ReactNode }) {
   const suiClient = useSuiClient();
 
   useEffect(() => {
-    setSessionState(loadZkLoginSession());
-  }, []);
+    const stored = loadZkLoginSession();
+    if (!stored) return;
+
+    suiClient.getLatestSuiSystemState().then(({ epoch }) => {
+      if (Number(epoch) >= stored.maxEpoch) {
+        clearZkLoginSession();
+        setSessionState(null);
+      } else {
+        setSessionState(stored);
+      }
+    }).catch(() => {
+      setSessionState(stored);
+    });
+  }, [suiClient]);
 
   function setSession(s: ZkLoginSession | null) {
     setSessionState(s);
@@ -38,6 +50,12 @@ export function ZkLoginProvider({ children }: { children: React.ReactNode }) {
 
   async function execute(tx: Transaction) {
     if (!session) throw new Error("No zkLogin session");
+    const { epoch } = await suiClient.getLatestSuiSystemState();
+    if (Number(epoch) >= session.maxEpoch) {
+      clearZkLoginSession();
+      setSessionState(null);
+      throw new Error("Your session has expired. Please sign in again.");
+    }
     return zkExecuteTransaction(tx, session, suiClient);
   }
 
