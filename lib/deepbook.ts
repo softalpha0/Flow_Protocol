@@ -6,6 +6,10 @@ export const DEEPBOOK_POOL = "SUI_DBUSDC";
 export const DBUSDC_TYPE =
   "0xf7152c05930480cd740d7311b5b8b45c6f488e3a53a11c3f74a6fac36a52e0d7::DBUSDC::DBUSDC";
 
+// Testnet DEEP token type — used to create a zero-balance coin when the user has no DEEP
+const DEEP_TYPE =
+  "0x36dbef866a1d62bf7328989a10fb2f07d769f4ee587c0de4a0a256e57e0a58a8::deep::DEEP";
+
 export function makeDeepBookClient(client: unknown, address: string) {
   return new DeepBookClient({
     client: client as never,
@@ -32,11 +36,19 @@ export function buildSwapAndSendTx(
   estimatedDbusdc: number,
   senderAddress: string
 ): void {
+  // User likely has no DEEP tokens — create a zero-balance DEEP coin via coin::zero
+  // so the PTB doesn't try to source DEEP from the wallet (fees come out of the output instead)
+  const zeroDEEP = tx.moveCall({
+    target: "0x2::coin::zero",
+    typeArguments: [DEEP_TYPE],
+  });
+
   const [remainingSui, dbusdc, remainingDeep] = db.deepBook.swapExactBaseForQuote({
     poolKey: DEEPBOOK_POOL,
     amount: suiAmount,
     deepAmount: 0,
     minOut: 0,
+    deepCoin: zeroDEEP,
   })(tx);
 
   tx.transferObjects([remainingSui, remainingDeep], senderAddress);
