@@ -115,21 +115,32 @@ export default function Send() {
 
       if (session) {
         setLoading(true);
-        await execute(tx);
-        setSuccess(crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.");
+        const result = await execute(tx) as { digest?: string } | undefined;
+        const digest = result?.digest ? ` Digest: ${result.digest.slice(0, 12)}…` : "";
+        setSuccess((crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.") + digest);
         setSingleRecipient(""); setSingleAmount(""); setCrossSuiAmount(""); setQuoteDbusdc(null);
         setRecipients([{ address: "", amount: "" }, { address: "", amount: "" }]);
         setCrossAddresses(["", ""]);
       } else {
-        signAndExecute({ transaction: tx }, {
-          onSuccess: () => {
-            setSuccess(crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.");
-            setSingleRecipient(""); setSingleAmount(""); setCrossSuiAmount(""); setQuoteDbusdc(null);
-            setRecipients([{ address: "", amount: "" }, { address: "", amount: "" }]);
-            setCrossAddresses(["", ""]);
-          },
-          onError: (err) => setError(err.message),
-        });
+        signAndExecute(
+          { transaction: tx, options: { showEffects: true } },
+          {
+            onSuccess: (res) => {
+              const status = (res as { effects?: { status?: { status: string; error?: string } } })?.effects?.status;
+              if (status && status.status !== "success") {
+                setError(status.error ?? "Transaction failed on-chain");
+                return;
+              }
+              const digest = (res as { digest?: string })?.digest;
+              const suffix = digest ? ` Digest: ${digest.slice(0, 12)}…` : "";
+              setSuccess((crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.") + suffix);
+              setSingleRecipient(""); setSingleAmount(""); setCrossSuiAmount(""); setQuoteDbusdc(null);
+              setRecipients([{ address: "", amount: "" }, { address: "", amount: "" }]);
+              setCrossAddresses(["", ""]);
+            },
+            onError: (err) => setError(err.message),
+          }
+        );
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
