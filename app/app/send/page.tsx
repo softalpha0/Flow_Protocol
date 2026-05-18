@@ -88,9 +88,9 @@ export default function Send() {
       if (crossCurrency) {
         const suiAmt = Number(crossSuiAmount);
         if (!suiAmt || suiAmt <= 0) { setError("Enter a valid SUI amount to swap."); return; }
-        const validAddrs = crossAddresses.filter((a) => a.trim().startsWith("0x"));
-        if (validAddrs.length === 0) { setError("Enter at least one valid recipient address."); return; }
-        if (validAddrs.length !== crossAddresses.length) { setError("All recipient addresses must start with 0x."); return; }
+        const validAddrs = crossAddresses.map((a) => a.trim()).filter((a) => a.length > 0);
+        if (validAddrs.length === 0) { setError("Enter at least one recipient address."); return; }
+        if (validAddrs.some((a) => !a.startsWith("0x"))) { setError("All recipient addresses must start with 0x."); return; }
 
         const estimated = quoteDbusdc ?? 0;
         const db = makeDeepBookClient(suiClient as never, activeAddress);

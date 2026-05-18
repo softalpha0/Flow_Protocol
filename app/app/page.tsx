@@ -19,19 +19,10 @@ type EventFields = {
   deadline?: string;
 };
 
-const isStreamCreated = (type: string) => type.endsWith("::stream::StreamCreated");
-const isPactCreated = (type: string) => type.endsWith("::pact::PactCreated");
-
 export default function Dashboard() {
   const account = useCurrentAccount();
   const { session } = useZkLogin();
   const activeAddress = account?.address ?? session?.address ?? null;
-
-  const { data: sentEvents } = useSuiClientQuery(
-    "queryEvents",
-    { query: { Sender: activeAddress! }, limit: 100 },
-    { enabled: !!activeAddress }
-  );
 
   const { data: globalStreamEvents } = useSuiClientQuery(
     "queryEvents",
@@ -68,34 +59,28 @@ export default function Dashboard() {
     );
   }
 
-  const sentStreams = (sentEvents?.data ?? []).filter(e => isStreamCreated(e.type));
   const allGlobalStreams = [
     ...(globalStreamEvents?.data ?? []),
     ...(globalStreamEventsOld?.data ?? []),
   ];
-  const receivedStreams = allGlobalStreams.filter(e => {
-    const f = e.parsedJson as EventFields;
-    return f?.recipient === activeAddress;
-  });
   const seenStreamKeys = new Set<string>();
-  const myStreams = [...sentStreams, ...receivedStreams].filter(e => {
+  const myStreams = allGlobalStreams.filter(e => {
+    const f = e.parsedJson as EventFields;
+    if (f?.sender !== activeAddress && f?.recipient !== activeAddress) return false;
     const key = e.id.txDigest + e.id.eventSeq;
     if (seenStreamKeys.has(key)) return false;
     seenStreamKeys.add(key);
     return true;
   });
 
-  const sentPacts = (sentEvents?.data ?? []).filter(e => isPactCreated(e.type));
   const allGlobalPacts = [
     ...(globalPactEvents?.data ?? []),
     ...(globalPactEventsOld?.data ?? []),
   ];
-  const receivedPacts = allGlobalPacts.filter(e => {
-    const f = e.parsedJson as EventFields;
-    return f?.recipient === activeAddress;
-  });
   const seenPactKeys = new Set<string>();
-  const myPacts = [...sentPacts, ...receivedPacts].filter(e => {
+  const myPacts = allGlobalPacts.filter(e => {
+    const f = e.parsedJson as EventFields;
+    if (f?.sender !== activeAddress && f?.recipient !== activeAddress) return false;
     const key = e.id.txDigest + e.id.eventSeq;
     if (seenPactKeys.has(key)) return false;
     seenPactKeys.add(key);
