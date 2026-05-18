@@ -41,6 +41,7 @@ export default function Send() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [txDigest, setTxDigest] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const isPending = walletPending || loading;
   const coinLabel = COIN_OPTIONS.find((o) => o.value === coinType)?.label;
@@ -80,7 +81,7 @@ export default function Send() {
 
   async function handleSend() {
     if (!activeAddress) return;
-    setError(""); setSuccess("");
+    setError(""); setSuccess(""); setTxDigest(null);
 
     try {
       const tx = new Transaction();
@@ -116,8 +117,8 @@ export default function Send() {
       if (session) {
         setLoading(true);
         const result = await execute(tx) as { digest?: string } | undefined;
-        const digest = result?.digest ? ` Digest: ${result.digest.slice(0, 12)}…` : "";
-        setSuccess((crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.") + digest);
+        if (result?.digest) setTxDigest(result.digest);
+        setSuccess(crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.");
         setSingleRecipient(""); setSingleAmount(""); setCrossSuiAmount(""); setQuoteDbusdc(null);
         setRecipients([{ address: "", amount: "" }, { address: "", amount: "" }]);
         setCrossAddresses(["", ""]);
@@ -127,8 +128,8 @@ export default function Send() {
           {
             onSuccess: (res) => {
               const digest = (res as { digest?: string })?.digest;
-              const suffix = digest ? ` Digest: ${digest.slice(0, 12)}…` : "";
-              setSuccess((crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.") + suffix);
+              if (digest) setTxDigest(digest);
+              setSuccess(crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.");
               setSingleRecipient(""); setSingleAmount(""); setCrossSuiAmount(""); setQuoteDbusdc(null);
               setRecipients([{ address: "", amount: "" }, { address: "", amount: "" }]);
               setCrossAddresses(["", ""]);
@@ -297,7 +298,24 @@ export default function Send() {
           )}
 
           {error && <p className="text-sm text-[#EF4444] bg-red-50 px-4 py-3 rounded-lg">{error}</p>}
-          {success && <p className="text-sm text-[#10B981] bg-green-50 px-4 py-3 rounded-lg">{success}</p>}
+          {success && (
+            <div className="bg-green-50 border border-green-200 px-4 py-3 rounded-lg space-y-1">
+              <p className="text-sm text-[#10B981] font-medium">{success}</p>
+              {txDigest && (
+                <a
+                  href={`https://suiscan.xyz/testnet/tx/${txDigest}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-[#2563EB] hover:underline font-mono"
+                >
+                  {txDigest.slice(0, 16)}…
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              )}
+            </div>
+          )}
 
           <button
             onClick={handleSend}
