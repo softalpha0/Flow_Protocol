@@ -123,14 +123,9 @@ export default function Send() {
         setCrossAddresses(["", ""]);
       } else {
         signAndExecute(
-          { transaction: tx, options: { showEffects: true } },
+          { transaction: tx },
           {
             onSuccess: (res) => {
-              const status = (res as { effects?: { status?: { status: string; error?: string } } })?.effects?.status;
-              if (status && status.status !== "success") {
-                setError(status.error ?? "Transaction failed on-chain");
-                return;
-              }
               const digest = (res as { digest?: string })?.digest;
               const suffix = digest ? ` Digest: ${digest.slice(0, 12)}…` : "";
               setSuccess((crossCurrency ? "Swap and send complete. Recipients received DBUSDC." : "Payment sent.") + suffix);
