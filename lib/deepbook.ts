@@ -36,6 +36,12 @@ export function buildSwapAndSendTx(
   estimatedDbusdc: number,
   senderAddress: string
 ): void {
+  // Split the SUI amount from the gas coin explicitly.
+  // coinWithBalance for SUI conflicts with gas reservation during PTB build,
+  // so we split it ourselves and pass it as baseCoin.
+  const suiAmountMist = BigInt(Math.round(suiAmount * 1_000_000_000));
+  const [baseSuiCoin] = tx.splitCoins(tx.gas, [tx.pure.u64(suiAmountMist)]);
+
   // User likely has no DEEP tokens — create a zero-balance DEEP coin via coin::zero
   // so the PTB doesn't try to source DEEP from the wallet (fees come out of the output instead)
   const zeroDEEP = tx.moveCall({
@@ -48,6 +54,7 @@ export function buildSwapAndSendTx(
     amount: suiAmount,
     deepAmount: 0,
     minOut: 0,
+    baseCoin: baseSuiCoin,
     deepCoin: zeroDEEP,
   })(tx);
 
