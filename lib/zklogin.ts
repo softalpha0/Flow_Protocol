@@ -9,22 +9,13 @@ import {
 } from "@mysten/sui/zklogin";
 import { Transaction } from "@mysten/sui/transactions";
 
-type TransactionEffects = {
-  status?: { status: string; error?: string };
-};
-
-type ExecuteResult = {
-  digest?: string;
-  effects?: TransactionEffects;
-};
-
 type SuiClientLike = {
   getLatestSuiSystemState(): Promise<{ epoch: string | bigint }>;
   executeTransactionBlock(args: {
     transactionBlock: Uint8Array;
     signature: string;
     options?: Record<string, boolean>;
-  }): Promise<ExecuteResult>;
+  }): Promise<{ digest?: string; effects?: { status?: { status: string; error?: string } } | null }>;
 };
 
 export const GOOGLE_CLIENT_ID =
@@ -207,7 +198,7 @@ export async function zkExecuteTransaction(tx: Transaction, session: ZkLoginSess
     options: { showEffects: true },
   });
 
-  const status = result?.effects?.status;
+  const status = result?.effects?.status ?? null;
   if (status && status.status !== "success") {
     throw new Error(status.error ?? "Transaction failed on-chain");
   }
