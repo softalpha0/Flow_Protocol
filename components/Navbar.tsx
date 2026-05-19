@@ -38,7 +38,7 @@ export default function Navbar() {
           <Link href="/app/pact/new" onClick={() => setOpen(false)} className="text-sm text-[#6B7280] hover:text-[#111827]">Pact</Link>
           <Link href="/app/send" onClick={() => setOpen(false)} className="text-sm text-[#6B7280] hover:text-[#111827]">Send</Link>
           <Link href="/sdk" onClick={() => setOpen(false)} className="text-sm text-[#6B7280] hover:text-[#111827]">SDK</Link>
-          <div className="pt-2 flex flex-col gap-2">{AuthButton}</div>
+          <div className="pt-2"><AuthButton /></div>
         </div>
       )}
     </nav>
