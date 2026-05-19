@@ -104,7 +104,7 @@ export default function Dashboard() {
         map[ids[i]] = {
           balance: String((f.balance as { fields: { value: string } })?.fields?.value ?? f.balance ?? "0"),
           last_withdrawn: String(f.last_withdrawn ?? "0"),
-          is_active: Boolean(f.is_active),
+          is_active: f.is_active === true || f.is_active === "true",
         };
       }
     });

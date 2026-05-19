@@ -33,7 +33,7 @@ export default function StreamDetail() {
 
   useEffect(() => {
     if (!fields) return;
-    if (fields.is_active !== "true") return;
+    if (fields.is_active !== true && fields.is_active !== "true") return;
 
     const interval = setInterval(() => {
       const now = BigInt(Date.now());
@@ -121,7 +121,7 @@ export default function StreamDetail() {
 
   const isSender = activeAddress?.toLowerCase() === fields?.sender?.toLowerCase();
   const isRecipient = activeAddress?.toLowerCase() === fields?.recipient?.toLowerCase();
-  const isActive = fields?.is_active === "true";
+  const isActive = fields?.is_active === true || fields?.is_active === "true";
 
   const balanceRaw = fields?.balance
     ? typeof fields.balance === "object"
