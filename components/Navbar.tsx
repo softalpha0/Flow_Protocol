@@ -3,21 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { ConnectButton } from "@mysten/dapp-kit";
-import ZkLoginButton from "@/components/ZkLoginButton";
-import { useZkLogin } from "@/contexts/ZkLoginContext";
+import AuthButton from "@/components/AuthButton";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const { session } = useZkLogin();
-
-  const AuthButton = session ? <ZkLoginButton /> : (
-    <div className="flex items-center gap-2">
-      <ZkLoginButton />
-      <span className="text-xs text-[#9CA3AF]">or</span>
-      <ConnectButton />
-    </div>
-  );
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#E2E8F0] bg-white/90 backdrop-blur-md">
@@ -34,7 +23,7 @@ export default function Navbar() {
           <Link href="/app/pact/new" className="text-sm text-[#6B7280] hover:text-[#111827] transition-colors">Pact</Link>
           <Link href="/app/send" className="text-sm text-[#6B7280] hover:text-[#111827] transition-colors">Send</Link>
           <Link href="/sdk" className="text-sm text-[#6B7280] hover:text-[#111827] transition-colors">SDK</Link>
-          {AuthButton}
+          <AuthButton />
         </div>
         <button className="md:hidden flex flex-col gap-1.5 p-2" onClick={() => setOpen(!open)}>
           <span className={`block w-5 h-0.5 bg-[#111827] transition-transform duration-200 ${open ? "rotate-45 translate-y-2" : ""}`} />
