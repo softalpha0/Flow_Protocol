@@ -68,16 +68,19 @@ export default function Dashboard() {
   const [streamObjs, setStreamObjs] = useState<Record<string, StreamObj>>({});
   const [pactObjs, setPactObjs] = useState<Record<string, PactObj>>({});
 
-  const { data: streamEvents } = useSuiClientQuery(
+  // staleTime: 0 ensures fresh data is always fetched on mount — no stale cache
+  const queryOpts = { staleTime: 0, refetchOnMount: true } as const;
+
+  const { data: streamEvents, isLoading: streamsLoading } = useSuiClientQuery(
     "queryEvents",
     { query: { MoveEventType: `${ORIGINAL_PACKAGE_ID}::stream::StreamCreated` }, limit: 100 },
-    { enabled: !!activeAddress }
+    { enabled: !!activeAddress, ...queryOpts }
   );
 
-  const { data: pactEvents } = useSuiClientQuery(
+  const { data: pactEvents, isLoading: pactsLoading } = useSuiClientQuery(
     "queryEvents",
     { query: { MoveEventType: `${ORIGINAL_PACKAGE_ID}::pact::PactCreated` }, limit: 100 },
-    { enabled: !!activeAddress }
+    { enabled: !!activeAddress, ...queryOpts }
   );
 
   const myStreams = (streamEvents?.data ?? []).filter(e => {
@@ -140,6 +143,7 @@ export default function Dashboard() {
     );
   }
 
+  const loading = streamsLoading || pactsLoading;
   const totalDeposited = myStreams.reduce((s, e) => s + Number((e.parsedJson as EventFields).deposit ?? 0), 0);
   const totalLocked = myPacts.reduce((s, e) => s + Number((e.parsedJson as EventFields).amount ?? 0), 0);
   const activeStreamCount = myStreams.filter(e => {
@@ -172,47 +176,54 @@ export default function Dashboard() {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs text-[#6B7280] uppercase tracking-wide font-medium">Total Streaming</p>
-              <span className="text-[#2563EB] text-base">⚡</span>
-            </div>
-            <p className="text-2xl font-bold text-[#111827]">{mistToSui(BigInt(totalDeposited))}</p>
+            <p className="text-[10px] text-[#6B7280] uppercase tracking-wide font-medium mb-3">Total Streaming</p>
+            {loading
+              ? <div className="h-8 w-24 bg-[#E2E8F0] rounded animate-pulse" />
+              : <p className="text-2xl font-bold text-[#111827]">{mistToSui(BigInt(totalDeposited))}</p>
+            }
             <p className="text-xs text-[#6B7280] mt-1">SUI deposited · {activeStreamCount} active</p>
           </div>
 
           <div className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs text-[#6B7280] uppercase tracking-wide font-medium">Pacts Locked</p>
-              <span className="text-[#2563EB] text-base">🛡</span>
-            </div>
-            <p className="text-2xl font-bold text-[#111827]">{mistToSui(BigInt(totalLocked))}</p>
+            <p className="text-[10px] text-[#6B7280] uppercase tracking-wide font-medium mb-3">Pacts Locked</p>
+            {loading
+              ? <div className="h-8 w-24 bg-[#E2E8F0] rounded animate-pulse" />
+              : <p className="text-2xl font-bold text-[#111827]">{mistToSui(BigInt(totalLocked))}</p>
+            }
             <p className="text-xs text-[#6B7280] mt-1">SUI in escrow · {myPacts.length} pact{myPacts.length !== 1 ? "s" : ""}</p>
           </div>
         </div>
 
         {/* Powered By */}
         <div className="flex items-center gap-6 px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] mb-8">
-          <p className="text-xs text-[#6B7280] uppercase tracking-wide font-medium">Powered by</p>
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm">📊</span>
-            <div>
-              <span className="text-xs font-semibold text-[#111827]">DeepBook</span>
-              <span className="text-xs text-[#6B7280] ml-1">Swaps</span>
-            </div>
+          <p className="text-[10px] text-[#6B7280] uppercase tracking-wide font-medium">Powered by</p>
+          <div>
+            <span className="text-xs font-semibold text-[#111827]">DeepBook</span>
+            <span className="text-xs text-[#6B7280] ml-1">Swaps</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm">🗄</span>
-            <div>
-              <span className="text-xs font-semibold text-[#111827]">Walrus</span>
-              <span className="text-xs text-[#6B7280] ml-1">Records</span>
-            </div>
+          <div>
+            <span className="text-xs font-semibold text-[#111827]">Walrus</span>
+            <span className="text-xs text-[#6B7280] ml-1">Records</span>
           </div>
         </div>
 
+        {/* Loading skeletons */}
+        {loading && (
+          <div className="space-y-3 mb-8">
+            {[1, 2].map(i => (
+              <div key={i} className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] animate-pulse">
+                <div className="h-4 w-32 bg-[#E2E8F0] rounded mb-3" />
+                <div className="h-8 w-40 bg-[#E2E8F0] rounded mb-2" />
+                <div className="h-3 w-48 bg-[#E2E8F0] rounded" />
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Streams */}
-        {myStreams.length > 0 && (
+        {!loading && myStreams.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Active Streams</h2>
+            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Streams</h2>
             <div className="space-y-3">
               {myStreams.map((e) => {
                 const f = e.parsedJson as EventFields;
@@ -236,8 +247,8 @@ export default function Dashboard() {
                         </p>
                         <p className="text-xs text-[#6B7280] font-mono mt-0.5">{shortenAddress(id)}</p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${isActive ? "text-green-600 bg-green-50" : "text-[#6B7280] bg-[#E2E8F0]"}`}>
-                        {isActive ? "● Active" : "Ended"}
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${isActive ? "text-green-600 bg-green-50 border border-green-200" : "text-[#6B7280] bg-[#F8FAFC] border border-[#E2E8F0]"}`}>
+                        {isActive ? "Active" : "Ended"}
                       </span>
                     </div>
 
@@ -251,28 +262,25 @@ export default function Dashboard() {
                     </p>
 
                     <div className="w-full h-1.5 bg-[#E2E8F0] rounded-full mb-4">
-                      <div
-                        className="h-1.5 rounded-full bg-[#2563EB] transition-all"
-                        style={{ width: `${pct}%` }}
-                      />
+                      <div className="h-1.5 rounded-full bg-[#2563EB]" style={{ width: `${pct}%` }} />
                     </div>
 
                     <div className="flex gap-2">
                       {!isSender && isActive && (
                         <Link href={`/app/stream/${id}`}
                           className="flex-1 py-2 rounded-lg bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] text-xs font-semibold text-center transition-colors">
-                          ↓ Claim
+                          Claim
                         </Link>
                       )}
                       {isSender && isActive && (
                         <Link href={`/app/stream/${id}`}
-                          className="flex-1 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold text-center transition-colors">
-                          × Cancel
+                          className="flex-1 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold text-center transition-colors border border-red-100">
+                          Cancel
                         </Link>
                       )}
                       <Link href={`/app/stream/${id}`}
                         className="flex-1 py-2 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#6B7280] hover:text-[#2563EB] text-xs font-semibold text-center transition-colors">
-                        View →
+                        View
                       </Link>
                     </div>
                   </div>
@@ -283,7 +291,7 @@ export default function Dashboard() {
         )}
 
         {/* Pacts */}
-        {myPacts.length > 0 && (
+        {!loading && myPacts.length > 0 && (
           <div className="mb-8">
             <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Pacts</h2>
             <div className="space-y-3">
@@ -321,14 +329,14 @@ export default function Dashboard() {
 
                     {blob && blob.length > 2 && (
                       <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] mb-3">
-                        <span className="text-[#2563EB] text-xs">🗄</span>
-                        <span className="text-xs text-[#6B7280] font-mono">Stored on Walrus · {blob.slice(0, 14)}…</span>
+                        <span className="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wide">Walrus</span>
+                        <span className="text-xs text-[#6B7280] font-mono">{blob.slice(0, 14)}…</span>
                       </div>
                     )}
 
                     <Link href={`/app/pact/${id}`}
                       className="block w-full py-2 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#6B7280] hover:text-[#2563EB] text-xs font-semibold text-center transition-colors">
-                      View →
+                      View
                     </Link>
                   </div>
                 );
@@ -337,7 +345,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {myStreams.length === 0 && myPacts.length === 0 && (
+        {!loading && myStreams.length === 0 && myPacts.length === 0 && (
           <div className="p-8 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-center">
             <p className="text-sm text-[#6B7280]">No activity yet. Create a stream or pact to get started.</p>
           </div>
