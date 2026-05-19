@@ -26,7 +26,7 @@ export default function StreamDetail() {
     options: { showContent: true, showType: true },
   });
 
-  const content = data?.data?.content as { fields?: Record<string, string>; type?: string } | undefined;
+  const content = data?.data?.content as { fields?: Record<string, unknown>; type?: string } | undefined;
   const fields = content?.fields;
   const objectType = content?.type ?? data?.data?.type ?? "";
   const coinType = objectType.match(/<(.+)>/)?.[1] ?? "";
@@ -37,12 +37,12 @@ export default function StreamDetail() {
 
     const interval = setInterval(() => {
       const now = BigInt(Date.now());
-      const lastWithdrawn = BigInt(fields.last_withdrawn);
-      const rate = BigInt(fields.rate_per_second);
+      const lastWithdrawn = BigInt(String(fields.last_withdrawn));
+      const rate = BigInt(String(fields.rate_per_second));
       const balance = BigInt(
         typeof fields.balance === "object"
-          ? (fields.balance as unknown as { fields: { value: string } }).fields.value
-          : fields.balance
+          ? (fields.balance as { fields: { value: string } }).fields.value
+          : String(fields.balance)
       );
       const elapsedMs = now - lastWithdrawn;
       const elapsedSec = elapsedMs / 1000n;
@@ -119,14 +119,14 @@ export default function StreamDetail() {
     }
   }
 
-  const isSender = activeAddress?.toLowerCase() === fields?.sender?.toLowerCase();
-  const isRecipient = activeAddress?.toLowerCase() === fields?.recipient?.toLowerCase();
+  const isSender = activeAddress?.toLowerCase() === String(fields?.sender ?? "").toLowerCase();
+  const isRecipient = activeAddress?.toLowerCase() === String(fields?.recipient ?? "").toLowerCase();
   const isActive = fields?.is_active === true || fields?.is_active === "true";
 
   const balanceRaw = fields?.balance
     ? typeof fields.balance === "object"
-      ? (fields.balance as unknown as { fields: { value: string } }).fields.value
-      : fields.balance
+      ? (fields.balance as { fields: { value: string } }).fields.value
+      : String(fields.balance)
     : "0";
 
   return (
@@ -149,15 +149,15 @@ export default function StreamDetail() {
             <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">From</span>
-                <span className="font-mono">{shortenAddress(fields.sender)}</span>
+                <span className="font-mono">{shortenAddress(String(fields.sender))}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">To</span>
-                <span className="font-mono">{shortenAddress(fields.recipient)}</span>
+                <span className="font-mono">{shortenAddress(String(fields.recipient))}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">Rate</span>
-                <span>{mistToSui(BigInt(fields.rate_per_second))} / sec</span>
+                <span>{mistToSui(BigInt(String(fields.rate_per_second)))} / sec</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[#6B7280]">Remaining</span>
