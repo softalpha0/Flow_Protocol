@@ -1,12 +1,11 @@
 "use client";
 
-import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
+import { useState, useEffect, useCallback } from "react";
+import { useCurrentAccount, useSuiClientQuery, useSuiClient } from "@mysten/dapp-kit";
 import Link from "next/link";
 import { mistToSui, shortenAddress } from "@/lib/sui";
 import { useZkLogin } from "@/contexts/ZkLoginContext";
 
-// Sui preserves the original package ID in event types even after upgrades,
-// so all StreamCreated / PactCreated events — old and new — share this type prefix.
 const ORIGINAL_PACKAGE_ID = "0x3170c4670ac048b33460524a1ee6bad245f86bac32345e761257ff970540c94b";
 
 type EventFields = {
@@ -20,10 +19,54 @@ type EventFields = {
   deadline?: string;
 };
 
+type StreamObj = {
+  balance: string;
+  last_withdrawn: string;
+  is_active: boolean;
+};
+
+type PactObj = {
+  description: string;
+  walrus_blob_id: string;
+  status: number;
+};
+
+function LiveCounter({ ratePerSecond, lastWithdrawn }: { ratePerSecond: number; lastWithdrawn: number }) {
+  const [streamed, setStreamed] = useState(0);
+  useEffect(() => {
+    const update = () => setStreamed((Date.now() - lastWithdrawn) / 1000 * ratePerSecond);
+    update();
+    const id = setInterval(update, 100);
+    return () => clearInterval(id);
+  }, [ratePerSecond, lastWithdrawn]);
+
+  const [int, dec] = (streamed / 1e9).toFixed(5).split(".");
+  return (
+    <span className="font-mono">
+      <span className="text-[#2563EB] text-2xl font-bold">{int}</span>
+      <span className="text-[#2563EB] text-2xl font-bold">.</span>
+      <span className="text-[#2563EB] text-lg font-bold">{dec}</span>
+      <span className="text-[#6B7280] text-sm ml-1">SUI</span>
+    </span>
+  );
+}
+
+const PACT_STATUS = ["Pending", "Completed", "Disputed", "Cancelled"];
+const PACT_STATUS_STYLE = [
+  "text-amber-600 bg-amber-50 border border-amber-200",
+  "text-green-600 bg-green-50 border border-green-200",
+  "text-red-600 bg-red-50 border border-red-200",
+  "text-[#6B7280] bg-[#F8FAFC] border border-[#E2E8F0]",
+];
+
 export default function Dashboard() {
   const account = useCurrentAccount();
   const { session } = useZkLogin();
+  const suiClient = useSuiClient();
   const activeAddress = account?.address ?? session?.address ?? null;
+
+  const [streamObjs, setStreamObjs] = useState<Record<string, StreamObj>>({});
+  const [pactObjs, setPactObjs] = useState<Record<string, PactObj>>({});
 
   const { data: streamEvents } = useSuiClientQuery(
     "queryEvents",
@@ -37,6 +80,55 @@ export default function Dashboard() {
     { enabled: !!activeAddress }
   );
 
+  const myStreams = (streamEvents?.data ?? []).filter(e => {
+    const f = e.parsedJson as EventFields;
+    return f?.sender === activeAddress || f?.recipient === activeAddress;
+  });
+
+  const myPacts = (pactEvents?.data ?? []).filter(e => {
+    const f = e.parsedJson as EventFields;
+    return f?.sender === activeAddress || f?.recipient === activeAddress;
+  });
+
+  const fetchStreamObjs = useCallback(async () => {
+    const ids = myStreams.map(e => (e.parsedJson as EventFields).stream_id!).filter(Boolean);
+    if (!ids.length) return;
+    const results = await suiClient.multiGetObjects({ ids, options: { showContent: true } });
+    const map: Record<string, StreamObj> = {};
+    results.forEach((obj, i) => {
+      if (obj.data?.content?.dataType === "moveObject") {
+        const f = (obj.data.content as { fields: Record<string, unknown> }).fields;
+        map[ids[i]] = {
+          balance: String((f.balance as { fields: { value: string } })?.fields?.value ?? f.balance ?? "0"),
+          last_withdrawn: String(f.last_withdrawn ?? "0"),
+          is_active: Boolean(f.is_active),
+        };
+      }
+    });
+    setStreamObjs(map);
+  }, [myStreams.length, suiClient]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const fetchPactObjs = useCallback(async () => {
+    const ids = myPacts.map(e => (e.parsedJson as EventFields).pact_id!).filter(Boolean);
+    if (!ids.length) return;
+    const results = await suiClient.multiGetObjects({ ids, options: { showContent: true } });
+    const map: Record<string, PactObj> = {};
+    results.forEach((obj, i) => {
+      if (obj.data?.content?.dataType === "moveObject") {
+        const f = (obj.data.content as { fields: Record<string, unknown> }).fields;
+        map[ids[i]] = {
+          description: String(f.description ?? ""),
+          walrus_blob_id: String(f.walrus_blob_id ?? ""),
+          status: Number(f.status ?? 0),
+        };
+      }
+    });
+    setPactObjs(map);
+  }, [myPacts.length, suiClient]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { fetchStreamObjs(); }, [fetchStreamObjs]);
+  useEffect(() => { fetchPactObjs(); }, [fetchPactObjs]);
+
   if (!activeAddress) {
     return (
       <main className="min-h-screen bg-white">
@@ -48,87 +140,197 @@ export default function Dashboard() {
     );
   }
 
-  const myStreams = (streamEvents?.data ?? []).filter(e => {
-    const f = e.parsedJson as EventFields;
-    return f?.sender === activeAddress || f?.recipient === activeAddress;
-  });
-
-  const myPacts = (pactEvents?.data ?? []).filter(e => {
-    const f = e.parsedJson as EventFields;
-    return f?.sender === activeAddress || f?.recipient === activeAddress;
-  });
+  const totalDeposited = myStreams.reduce((s, e) => s + Number((e.parsedJson as EventFields).deposit ?? 0), 0);
+  const totalLocked = myPacts.reduce((s, e) => s + Number((e.parsedJson as EventFields).amount ?? 0), 0);
+  const activeStreamCount = myStreams.filter(e => {
+    const obj = streamObjs[(e.parsedJson as EventFields).stream_id!];
+    return obj ? obj.is_active : true;
+  }).length;
 
   return (
     <main className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-6 pt-28 pb-16">
-        <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
+      <div className="max-w-2xl mx-auto px-4 pt-24 pb-16">
 
-        <div className="grid md:grid-cols-3 gap-4 mb-10">
-          <Link href="/app/stream/new" className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group">
-            <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Stream</p>
-            <p className="font-semibold group-hover:text-[#2563EB] transition-colors">Create a payment stream</p>
-            <p className="text-sm text-[#6B7280] mt-1">Pay per second to any address</p>
-          </Link>
-          <Link href="/app/pact/new" className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group">
-            <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Pact</p>
-            <p className="font-semibold group-hover:text-[#2563EB] transition-colors">Create a pact</p>
-            <p className="text-sm text-[#6B7280] mt-1">Milestone escrow with deadline</p>
-          </Link>
-          <Link href="/app/send" className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors group">
-            <p className="text-xs text-[#6B7280] mb-2 uppercase tracking-wide">Instant</p>
-            <p className="font-semibold group-hover:text-[#2563EB] transition-colors">Send or split</p>
-            <p className="text-sm text-[#6B7280] mt-1">One or many recipients</p>
-          </Link>
+        {/* Header */}
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-[#111827]">Dashboard</h1>
+            <p className="text-[#6B7280] text-sm mt-1">Overview of your payment flows</p>
+          </div>
+          <div className="flex gap-2 flex-shrink-0">
+            <Link href="/app/stream/new"
+              className="flex items-center gap-1 px-4 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-medium transition-colors">
+              + New Stream
+            </Link>
+            <Link href="/app/pact/new"
+              className="flex items-center gap-1 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] text-[#374151] text-sm font-medium transition-colors">
+              + New Pact
+            </Link>
+          </div>
         </div>
 
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-3 mb-8">
+          <div className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide font-medium">Total Streaming</p>
+              <span className="text-[#2563EB] text-base">⚡</span>
+            </div>
+            <p className="text-2xl font-bold text-[#111827]">{mistToSui(BigInt(totalDeposited))}</p>
+            <p className="text-xs text-[#6B7280] mt-1">SUI deposited · {activeStreamCount} active</p>
+          </div>
+
+          <div className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs text-[#6B7280] uppercase tracking-wide font-medium">Pacts Locked</p>
+              <span className="text-[#2563EB] text-base">🛡</span>
+            </div>
+            <p className="text-2xl font-bold text-[#111827]">{mistToSui(BigInt(totalLocked))}</p>
+            <p className="text-xs text-[#6B7280] mt-1">SUI in escrow · {myPacts.length} pact{myPacts.length !== 1 ? "s" : ""}</p>
+          </div>
+        </div>
+
+        {/* Powered By */}
+        <div className="flex items-center gap-6 px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] mb-8">
+          <p className="text-xs text-[#6B7280] uppercase tracking-wide font-medium">Powered by</p>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm">📊</span>
+            <div>
+              <span className="text-xs font-semibold text-[#111827]">DeepBook</span>
+              <span className="text-xs text-[#6B7280] ml-1">Swaps</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm">🗄</span>
+            <div>
+              <span className="text-xs font-semibold text-[#111827]">Walrus</span>
+              <span className="text-xs text-[#6B7280] ml-1">Records</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Streams */}
         {myStreams.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Streams</h2>
-            <div className="space-y-2">
+            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Active Streams</h2>
+            <div className="space-y-3">
               {myStreams.map((e) => {
                 const f = e.parsedJson as EventFields;
-                const id = f.stream_id;
+                const id = f.stream_id!;
+                const obj = streamObjs[id];
                 const isSender = f.sender === activeAddress;
+                const ratePerSec = Number(f.rate_per_second ?? 0);
+                const deposit = Number(f.deposit ?? 0);
+                const lastWithdrawn = obj ? Number(obj.last_withdrawn) : Number(e.timestampMs ?? Date.now());
+                const isActive = obj ? obj.is_active : true;
+                const remaining = obj ? Number(obj.balance) : deposit;
+                const spent = Math.max(0, deposit - remaining);
+                const pct = deposit > 0 ? Math.min(100, (spent / deposit) * 100) : 0;
+
                 return (
-                  <Link key={e.id.txDigest + e.id.eventSeq} href={`/app/stream/${id}`}
-                    className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors">
-                    <div>
-                      <p className="text-sm font-medium">
-                        {isSender ? "To " : "From "}
-                        <span className="font-mono text-[#2563EB]">{shortenAddress(isSender ? f.recipient : f.sender)}</span>
-                      </p>
-                      <p className="text-xs text-[#6B7280] mt-0.5">
-                        {mistToSui(BigInt(f.deposit ?? 0))} SUI deposited · {mistToSui(BigInt(f.rate_per_second ?? 0))} SUI/sec
-                      </p>
+                  <div key={id} className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="text-sm font-semibold text-[#111827]">
+                          {isSender ? `To ${shortenAddress(f.recipient)}` : `From ${shortenAddress(f.sender)}`}
+                        </p>
+                        <p className="text-xs text-[#6B7280] font-mono mt-0.5">{shortenAddress(id)}</p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${isActive ? "text-green-600 bg-green-50" : "text-[#6B7280] bg-[#E2E8F0]"}`}>
+                        {isActive ? "● Active" : "Ended"}
+                      </span>
                     </div>
-                    <span className="text-xs text-[#6B7280]">View</span>
-                  </Link>
+
+                    <p className="text-xs text-[#6B7280] mb-1">Streamed</p>
+                    {isActive
+                      ? <LiveCounter ratePerSecond={ratePerSec} lastWithdrawn={lastWithdrawn} />
+                      : <span className="text-xl font-bold text-[#6B7280] font-mono">{mistToSui(BigInt(spent))} SUI</span>
+                    }
+                    <p className="text-xs text-[#6B7280] mt-1 mb-3">
+                      of {mistToSui(BigInt(deposit))} SUI total · {mistToSui(BigInt(ratePerSec))}/sec
+                    </p>
+
+                    <div className="w-full h-1.5 bg-[#E2E8F0] rounded-full mb-4">
+                      <div
+                        className="h-1.5 rounded-full bg-[#2563EB] transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      {!isSender && isActive && (
+                        <Link href={`/app/stream/${id}`}
+                          className="flex-1 py-2 rounded-lg bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] text-xs font-semibold text-center transition-colors">
+                          ↓ Claim
+                        </Link>
+                      )}
+                      {isSender && isActive && (
+                        <Link href={`/app/stream/${id}`}
+                          className="flex-1 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold text-center transition-colors">
+                          × Cancel
+                        </Link>
+                      )}
+                      <Link href={`/app/stream/${id}`}
+                        className="flex-1 py-2 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#6B7280] hover:text-[#2563EB] text-xs font-semibold text-center transition-colors">
+                        View →
+                      </Link>
+                    </div>
+                  </div>
                 );
               })}
             </div>
           </div>
         )}
 
+        {/* Pacts */}
         {myPacts.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Pacts</h2>
-            <div className="space-y-2">
+            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Pacts</h2>
+            <div className="space-y-3">
               {myPacts.map((e) => {
                 const f = e.parsedJson as EventFields;
-                const id = f.pact_id;
+                const id = f.pact_id!;
+                const obj = pactObjs[id];
                 const isSender = f.sender === activeAddress;
+                const amount = Number(f.amount ?? 0);
+                const deadline = Number(f.deadline ?? 0);
+                const status = obj?.status ?? 0;
+                const desc = obj?.description || (isSender ? `To ${shortenAddress(f.recipient)}` : `From ${shortenAddress(f.sender)}`);
+                const blob = obj?.walrus_blob_id ?? "";
+
                 return (
-                  <Link key={e.id.txDigest + e.id.eventSeq} href={`/app/pact/${id}`}
-                    className="flex items-center justify-between p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] transition-colors">
-                    <div>
-                      <p className="text-sm font-medium">
-                        {isSender ? "To " : "From "}
-                        <span className="font-mono text-[#2563EB]">{shortenAddress(isSender ? f.recipient : f.sender)}</span>
-                      </p>
-                      <p className="text-xs text-[#6B7280] mt-0.5">{mistToSui(BigInt(f.amount ?? 0))} SUI locked</p>
+                  <div key={id} className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0 pr-3">
+                        <p className="text-sm font-semibold text-[#111827] truncate">{desc}</p>
+                        <p className="text-xs text-[#6B7280] font-mono mt-0.5">{shortenAddress(id)}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-bold text-[#111827]">{mistToSui(BigInt(amount))} SUI</p>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${PACT_STATUS_STYLE[status] ?? PACT_STATUS_STYLE[3]}`}>
+                          {PACT_STATUS[status] ?? "Unknown"}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-xs text-[#6B7280]">View</span>
-                  </Link>
+
+                    {deadline > 0 && (
+                      <p className="text-xs text-[#6B7280] mb-3">
+                        Deadline: {new Date(deadline).toLocaleDateString()}
+                      </p>
+                    )}
+
+                    {blob && blob.length > 2 && (
+                      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] mb-3">
+                        <span className="text-[#2563EB] text-xs">🗄</span>
+                        <span className="text-xs text-[#6B7280] font-mono">Stored on Walrus · {blob.slice(0, 14)}…</span>
+                      </div>
+                    )}
+
+                    <Link href={`/app/pact/${id}`}
+                      className="block w-full py-2 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#6B7280] hover:text-[#2563EB] text-xs font-semibold text-center transition-colors">
+                      View →
+                    </Link>
+                  </div>
                 );
               })}
             </div>
@@ -136,7 +338,7 @@ export default function Dashboard() {
         )}
 
         {myStreams.length === 0 && myPacts.length === 0 && (
-          <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-center">
+          <div className="p-8 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-center">
             <p className="text-sm text-[#6B7280]">No activity yet. Create a stream or pact to get started.</p>
           </div>
         )}
