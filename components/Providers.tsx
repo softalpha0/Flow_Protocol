@@ -7,7 +7,7 @@ import { NETWORK } from "@/constants";
 const queryClient = new QueryClient();
 
 const { networkConfig } = createNetworkConfig({
-  testnet: { url: "https://rpc-testnet.suiscan.xyz", network: "testnet" as const },
+  testnet: { url: "https://fullnode.testnet.sui.io", network: "testnet" as const },
   mainnet: { url: "https://fullnode.mainnet.sui.io", network: "mainnet" as const },
 });
 
