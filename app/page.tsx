@@ -12,7 +12,7 @@ export default function Home() {
           <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-[#2563EB] opacity-[0.07] rounded-full blur-[140px]" />
         </div>
         <div className="relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#6B7280] mb-8 font-medium">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#374151] mb-8 font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] inline-block"></span>
             Live on Sui Testnet — Mainnet coming soon
           </div>
@@ -20,7 +20,7 @@ export default function Home() {
             The payment layer<br />
             <span className="text-[#2563EB]">for the open internet</span>
           </h1>
-          <p className="text-lg text-[#6B7280] max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-xl text-[#374151] max-w-2xl mx-auto mb-10 leading-relaxed">
             Flow is a programmable payments protocol on Sui. Stream any asset by the second, lock funds in milestone escrow, or split payments across a team — all onchain, non-custodial, composable with the full Sui DeFi stack.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
@@ -44,24 +44,24 @@ export default function Home() {
             </div>
             <div className="p-6 grid grid-cols-3 gap-3">
               <div className="col-span-3 md:col-span-1 p-4 rounded-xl bg-white border border-[#E2E8F0]">
-                <p className="text-[10px] text-[#6B7280] uppercase tracking-wide mb-2">Active Stream</p>
+                <p className="text-xs text-[#4B5563] uppercase tracking-wide mb-2">Active Stream</p>
                 <p className="text-2xl font-bold font-mono text-[#2563EB]">12.4471</p>
-                <p className="text-xs text-[#6B7280] mt-0.5">SUI flowing to 0x3f2a...c8b1</p>
+                <p className="text-sm text-[#4B5563] mt-0.5">SUI flowing to 0x3f2a...c8b1</p>
                 <div className="mt-3 h-1 rounded-full bg-[#E2E8F0] overflow-hidden">
                   <div className="h-full bg-[#2563EB] rounded-full" style={{ width: "42%" }} />
                 </div>
-                <p className="text-[10px] text-[#6B7280] mt-1">42% streamed</p>
+                <p className="text-xs text-[#4B5563] mt-1">42% streamed</p>
               </div>
               <div className="col-span-3 md:col-span-1 p-4 rounded-xl bg-white border border-[#E2E8F0]">
-                <p className="text-[10px] text-[#6B7280] uppercase tracking-wide mb-2">Open Pact</p>
+                <p className="text-xs text-[#4B5563] uppercase tracking-wide mb-2">Open Pact</p>
                 <p className="text-lg font-semibold text-[#111827]">Design Sprint</p>
-                <p className="text-xs text-[#6B7280] mt-0.5">500 USDC locked</p>
+                <p className="text-sm text-[#4B5563] mt-0.5">500 USDC locked</p>
                 <span className="mt-3 inline-block px-2 py-0.5 rounded-full bg-[#FEF9C3] text-[#854D0E] text-[10px] font-medium">Pending release</span>
               </div>
               <div className="col-span-3 md:col-span-1 p-4 rounded-xl bg-white border border-[#E2E8F0]">
-                <p className="text-[10px] text-[#6B7280] uppercase tracking-wide mb-2">Instant Split</p>
+                <p className="text-xs text-[#4B5563] uppercase tracking-wide mb-2">Instant Split</p>
                 <p className="text-lg font-semibold text-[#111827]">Team Payroll</p>
-                <p className="text-xs text-[#6B7280] mt-0.5">4 recipients</p>
+                <p className="text-sm text-[#4B5563] mt-0.5">4 recipients</p>
                 <p className="text-xs text-[#10B981] mt-3 font-medium">Settled in 400ms</p>
               </div>
             </div>
@@ -74,19 +74,19 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div>
             <p className="text-3xl font-bold text-[#111827] mb-1">400ms</p>
-            <p className="text-sm text-[#6B7280]">Settlement time</p>
+            <p className="text-sm text-[#374151]">Settlement time</p>
           </div>
           <div>
             <p className="text-3xl font-bold text-[#111827] mb-1">Any asset</p>
-            <p className="text-sm text-[#6B7280]">SUI, USDC, USDT and more</p>
+            <p className="text-sm text-[#374151]">SUI, USDC, USDT and more</p>
           </div>
           <div>
             <p className="text-3xl font-bold text-[#111827] mb-1">Non-custodial</p>
-            <p className="text-sm text-[#6B7280]">You control your funds</p>
+            <p className="text-sm text-[#374151]">You control your funds</p>
           </div>
           <div>
             <p className="text-3xl font-bold text-[#111827] mb-1">3 primitives</p>
-            <p className="text-sm text-[#6B7280]">Stream, Pact, Instant</p>
+            <p className="text-sm text-[#374151]">Stream, Pact, Instant</p>
           </div>
         </div>
       </section>
@@ -96,7 +96,7 @@ export default function Home() {
         <div className="text-center mb-16">
           <p className="text-xs text-[#2563EB] uppercase tracking-widest mb-3 font-semibold">Primitives</p>
           <h2 className="text-3xl md:text-4xl font-bold">Three ways to move money</h2>
-          <p className="text-[#6B7280] text-sm mt-3 max-w-lg mx-auto">Composable onchain building blocks for every payment use case</p>
+          <p className="text-[#374151] text-base mt-3 max-w-lg mx-auto font-medium">Composable onchain building blocks for every payment use case</p>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           <div className="p-8 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#2563EB] hover:shadow-sm transition-all group">
@@ -106,19 +106,19 @@ export default function Home() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold mb-3">Stream</h3>
-            <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
+            <p className="text-[#374151] text-base leading-relaxed mb-6">
               Pay per second. Salary, freelance work, subscriptions — money flows continuously to the recipient. Cancel anytime and get the unspent balance back.
             </p>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Real-time per-second payments
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Cancel and reclaim unused funds
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Works with any Sui token
               </div>
@@ -134,19 +134,19 @@ export default function Home() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold mb-3">Pact</h3>
-            <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
+            <p className="text-[#374151] text-base leading-relaxed mb-6">
               Milestone-based escrow. Lock funds onchain, define the terms, and release payment when the work is done. Dispute mechanism built in — no middleman needed.
             </p>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Funds locked until milestone complete
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Optional deadline enforcement
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Built-in dispute resolution
               </div>
@@ -160,19 +160,19 @@ export default function Home() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold mb-3">Instant</h3>
-            <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
+            <p className="text-[#374151] text-base leading-relaxed mb-6">
               Send to one address or split across an entire team in a single transaction. Fast, final, and cheap — no coordination overhead.
             </p>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Single or multi-recipient
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Split in one transaction
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-2 text-sm text-[#4B5563]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Instant finality on Sui
               </div>
@@ -186,12 +186,12 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-16 text-center">
           <p className="text-xs text-[#2563EB] uppercase tracking-widest mb-3 font-semibold">Integrations</p>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Plugged into the full Sui stack</h2>
-          <p className="text-[#6B7280] text-sm max-w-xl mx-auto">Flow composes natively with leading Sui protocols — bringing swaps, yield, and verifiable storage directly into your payment flows.</p>
+          <p className="text-[#374151] text-base max-w-xl mx-auto">Flow composes natively with leading Sui protocols — bringing swaps, yield, and verifiable storage directly into your payment flows.</p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <span className="px-4 py-1.5 rounded-full border border-[#E2E8F0] bg-white text-sm font-medium text-[#111827]">DeepBook</span>
             <span className="px-4 py-1.5 rounded-full border border-[#E2E8F0] bg-white text-sm font-medium text-[#111827]">Walrus</span>
-            <span className="px-4 py-1.5 rounded-full border border-[#E2E8F0] bg-white text-sm text-[#6B7280]">Scallop — Mainnet</span>
-            <span className="px-4 py-1.5 rounded-full border border-[#E2E8F0] bg-white text-sm text-[#6B7280]">More coming</span>
+            <span className="px-4 py-1.5 rounded-full border border-[#E2E8F0] bg-white text-sm text-[#374151]">Scallop — Mainnet</span>
+            <span className="px-4 py-1.5 rounded-full border border-[#E2E8F0] bg-white text-sm text-[#374151]">More coming</span>
           </div>
         </div>
       </section>
@@ -205,7 +205,7 @@ export default function Home() {
               Live now
             </div>
             <h2 className="text-3xl font-bold mb-4">DeepBook — Cross-currency swaps</h2>
-            <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
+            <p className="text-[#374151] text-base leading-relaxed mb-6">
               Flow is natively integrated with DeepBook v3, Sui&apos;s central limit order book. Swap any token at the point of payment — stream in SUI, pay in USDC — all in a single atomic transaction using Sui&apos;s Programmable Transaction Blocks.
             </p>
             <div className="space-y-4">
@@ -219,7 +219,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#111827]">Atomic swap and stream</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">Convert tokens and initiate a stream in one PTB — no intermediate steps, no custody risk</p>
+                  <p className="text-sm text-[#4B5563] mt-0.5">Convert tokens and initiate a stream in one PTB — no intermediate steps, no custody risk</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -231,7 +231,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#111827]">Best-price execution</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">Routes through DeepBook&apos;s on-chain order book for best available price, settled in 400ms</p>
+                  <p className="text-sm text-[#4B5563] mt-0.5">Routes through DeepBook&apos;s on-chain order book for best available price, settled in 400ms</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -242,7 +242,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#111827]">Gasless via zkLogin</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">Sign in with Google and submit swaps without holding SUI for gas — powered by Enoki</p>
+                  <p className="text-sm text-[#4B5563] mt-0.5">Sign in with Google and submit swaps without holding SUI for gas — powered by Enoki</p>
                 </div>
               </div>
             </div>
@@ -253,7 +253,7 @@ export default function Home() {
               <span className="text-xs px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#166534] font-medium">DeepBook v3</span>
             </div>
             <div className="p-4 rounded-xl bg-white border border-[#E2E8F0]">
-              <p className="text-xs text-[#6B7280] mb-2">You pay in</p>
+              <p className="text-sm text-[#4B5563] mb-2">You pay in</p>
               <div className="flex items-center justify-between">
                 <span className="text-xl font-bold text-[#111827]">50 SUI</span>
                 <span className="text-xs px-2 py-1 bg-[#F1F5F9] rounded-lg text-[#374151] font-medium">SUI</span>
@@ -267,7 +267,7 @@ export default function Home() {
               </div>
             </div>
             <div className="p-4 rounded-xl bg-white border border-[#E2E8F0]">
-              <p className="text-xs text-[#6B7280] mb-2">Recipient receives</p>
+              <p className="text-sm text-[#4B5563] mb-2">Recipient receives</p>
               <div className="flex items-center justify-between">
                 <span className="text-xl font-bold text-[#111827]">~62.40 DBUSDC</span>
                 <span className="text-xs px-2 py-1 bg-[#F1F5F9] rounded-lg text-[#374151] font-medium">USDC</span>
@@ -295,33 +295,33 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[#111827]">Pact Agreement</p>
-                    <p className="text-xs text-[#6B7280]">Stored on Walrus</p>
+                    <p className="text-sm text-[#4B5563]">Stored on Walrus</p>
                   </div>
                   <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#166534] font-medium">Verified</span>
                 </div>
                 <div className="space-y-2 text-xs font-mono">
                   <div className="flex items-center gap-2 p-2 rounded bg-[#F8FAFC]">
-                    <span className="text-[#6B7280] w-20 flex-shrink-0">blob_id</span>
+                    <span className="text-[#4B5563] w-20 flex-shrink-0">blob_id</span>
                     <span className="text-[#111827] truncate">0x7ab3f...e2c1d</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded bg-[#F8FAFC]">
-                    <span className="text-[#6B7280] w-20 flex-shrink-0">amount</span>
+                    <span className="text-[#4B5563] w-20 flex-shrink-0">amount</span>
                     <span className="text-[#111827]">500 USDC</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded bg-[#F8FAFC]">
-                    <span className="text-[#6B7280] w-20 flex-shrink-0">milestone</span>
+                    <span className="text-[#4B5563] w-20 flex-shrink-0">milestone</span>
                     <span className="text-[#111827]">Design delivery</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded bg-[#F8FAFC]">
-                    <span className="text-[#6B7280] w-20 flex-shrink-0">deadline</span>
+                    <span className="text-[#4B5563] w-20 flex-shrink-0">deadline</span>
                     <span className="text-[#111827]">2025-06-30</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded bg-[#F8FAFC]">
-                    <span className="text-[#6B7280] w-20 flex-shrink-0">parties</span>
+                    <span className="text-[#4B5563] w-20 flex-shrink-0">parties</span>
                     <span className="text-[#111827]">2 signatures</span>
                   </div>
                 </div>
-                <div className="pt-2 flex items-center gap-2 text-xs text-[#6B7280]">
+                <div className="pt-2 flex items-center gap-2 text-sm text-[#4B5563]">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5">
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
@@ -335,7 +335,7 @@ export default function Home() {
                 Live now
               </div>
               <h2 className="text-3xl font-bold mb-4">Walrus — Decentralized pact storage</h2>
-              <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
+              <p className="text-[#374151] text-base leading-relaxed mb-6">
                 Every Pact agreement on Flow is stored on Walrus, Sui&apos;s decentralized storage network. Terms, milestones, and dispute evidence are written to a permanent, tamper-proof blob — with the content hash anchored on Sui for verifiability.
               </p>
               <div className="space-y-4">
@@ -347,7 +347,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[#111827]">Immutable agreement records</p>
-                    <p className="text-xs text-[#6B7280] mt-0.5">Pact terms stored on Walrus cannot be altered — both parties have cryptographic proof</p>
+                    <p className="text-sm text-[#4B5563] mt-0.5">Pact terms stored on Walrus cannot be altered — both parties have cryptographic proof</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -359,7 +359,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[#111827]">On-chain dispute evidence</p>
-                    <p className="text-xs text-[#6B7280] mt-0.5">Upload deliverables, messages, or proofs to Walrus — referenced directly in the on-chain dispute flow</p>
+                    <p className="text-sm text-[#4B5563] mt-0.5">Upload deliverables, messages, or proofs to Walrus — referenced directly in the on-chain dispute flow</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -370,7 +370,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[#111827]">Always accessible</p>
-                    <p className="text-xs text-[#6B7280] mt-0.5">No single point of failure. Pact records survive even if Flow&apos;s frontend goes down</p>
+                    <p className="text-sm text-[#4B5563] mt-0.5">No single point of failure. Pact records survive even if Flow&apos;s frontend goes down</p>
                   </div>
                 </div>
               </div>
@@ -388,7 +388,7 @@ export default function Home() {
               Mainnet launch
             </div>
             <h2 className="text-3xl font-bold mb-4">Scallop — Yield-bearing streams</h2>
-            <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
+            <p className="text-[#374151] text-base leading-relaxed mb-6">
               On mainnet, Flow will integrate with Scallop Protocol — Sui&apos;s leading lending market — so deposited funds earn yield while they wait to be streamed. Your unstreamed balance generates APY, not just sits idle.
             </p>
             <div className="space-y-4">
@@ -401,7 +401,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#111827]">Earn while you stream</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">The full deposit earns Scallop yield. As funds stream out, yield accrues on the remaining balance</p>
+                  <p className="text-sm text-[#4B5563] mt-0.5">The full deposit earns Scallop yield. As funds stream out, yield accrues on the remaining balance</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -413,7 +413,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#111827]">No lockup, no penalty</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">Yield is non-custodial and cancellable — senders keep all earned APY on any remaining balance</p>
+                  <p className="text-sm text-[#4B5563] mt-0.5">Yield is non-custodial and cancellable — senders keep all earned APY on any remaining balance</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -424,7 +424,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#111827]">Capital-efficient payroll</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">DAOs and teams fund monthly payroll once — the unstreamed portion works in Scallop the whole time</p>
+                  <p className="text-sm text-[#4B5563] mt-0.5">DAOs and teams fund monthly payroll once — the unstreamed portion works in Scallop the whole time</p>
                 </div>
               </div>
             </div>
@@ -436,27 +436,27 @@ export default function Home() {
             </div>
             <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">Stream deposit</span>
+                <span className="text-[#4B5563]">Stream deposit</span>
                 <span className="font-semibold text-[#111827]">10,000 USDC</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">Stream duration</span>
+                <span className="text-[#4B5563]">Stream duration</span>
                 <span className="font-semibold text-[#111827]">30 days</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">Scallop APY</span>
+                <span className="text-[#4B5563]">Scallop APY</span>
                 <span className="font-semibold text-[#D97706]">~8.4%</span>
               </div>
               <div className="h-px bg-[#E2E8F0]" />
               <div className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">Estimated yield earned</span>
+                <span className="text-[#4B5563]">Estimated yield earned</span>
                 <span className="font-semibold text-[#10B981]">+~69 USDC</span>
               </div>
             </div>
             <div className="h-2 rounded-full bg-[#E2E8F0] overflow-hidden">
               <div className="h-full bg-gradient-to-r from-[#F59E0B] to-[#10B981] rounded-full" style={{ width: "60%" }} />
             </div>
-            <p className="text-xs text-[#6B7280] text-center">60% streamed — 40% still earning yield</p>
+            <p className="text-sm text-[#4B5563] text-center">60% streamed — 40% still earning yield</p>
             <div className="p-3 rounded-lg bg-white border border-[#FDE68A] text-center">
               <p className="text-xs text-[#92400E] font-medium">Available at mainnet launch</p>
             </div>
@@ -482,7 +482,7 @@ export default function Home() {
                 </div>
                 <p className="text-sm font-semibold text-[#111827]">Remote teams</p>
               </div>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Stream salaries by the second to contributors anywhere in the world. No bank accounts, no wire transfers, no delays.</p>
+              <p className="text-sm text-[#374151] leading-relaxed">Stream salaries by the second to contributors anywhere in the world. No bank accounts, no wire transfers, no delays.</p>
             </div>
             <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:border-[#2563EB] hover:shadow-sm transition-all">
               <div className="flex items-center gap-3 mb-3">
@@ -493,7 +493,7 @@ export default function Home() {
                 </div>
                 <p className="text-sm font-semibold text-[#111827]">Freelance work</p>
               </div>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Create a Pact with clear milestone terms. Clients lock funds upfront, freelancers deliver, payment releases instantly — no chasing invoices.</p>
+              <p className="text-sm text-[#374151] leading-relaxed">Create a Pact with clear milestone terms. Clients lock funds upfront, freelancers deliver, payment releases instantly — no chasing invoices.</p>
             </div>
             <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:border-[#2563EB] hover:shadow-sm transition-all">
               <div className="flex items-center gap-3 mb-3">
@@ -504,7 +504,7 @@ export default function Home() {
                 </div>
                 <p className="text-sm font-semibold text-[#111827]">DAO payroll</p>
               </div>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Split contributor payments across a whole team in one transaction. Pay in USDC, USDT, or any token your DAO holds.</p>
+              <p className="text-sm text-[#374151] leading-relaxed">Split contributor payments across a whole team in one transaction. Pay in USDC, USDT, or any token your DAO holds.</p>
             </div>
             <div className="p-6 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:border-[#2563EB] hover:shadow-sm transition-all">
               <div className="flex items-center gap-3 mb-3">
@@ -515,7 +515,7 @@ export default function Home() {
                 </div>
                 <p className="text-sm font-semibold text-[#111827]">Onchain subscriptions</p>
               </div>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Replace recurring payment infrastructure with a Stream. Subscribers deposit once, and the service provider earns continuously.</p>
+              <p className="text-sm text-[#374151] leading-relaxed">Replace recurring payment infrastructure with a Stream. Subscribers deposit once, and the service provider earns continuously.</p>
             </div>
           </div>
         </div>
@@ -527,23 +527,23 @@ export default function Home() {
           <div>
             <p className="text-xs text-[#2563EB] uppercase tracking-widest mb-3 font-semibold">Developer SDK</p>
             <h2 className="text-3xl font-bold mb-4">Add programmable payments to any app</h2>
-            <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
+            <p className="text-[#374151] text-base leading-relaxed mb-6">
               The Flow SDK lets you integrate streaming, escrow, and split payments into your product in minutes. Returns a transaction for any Sui wallet to sign.
             </p>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+              <div className="flex items-center gap-3 text-sm text-[#374151]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Works with any Sui wallet
               </div>
-              <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+              <div className="flex items-center gap-3 text-sm text-[#374151]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 TypeScript-first with full type safety
               </div>
-              <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+              <div className="flex items-center gap-3 text-sm text-[#374151]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Supports any Sui coin type
               </div>
-              <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+              <div className="flex items-center gap-3 text-sm text-[#374151]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] flex-shrink-0"></span>
                 Composable with DeepBook, Scallop, Walrus
               </div>
@@ -579,7 +579,7 @@ export default function Home() {
           <div className="relative">
             <p className="text-xs text-[#2563EB] uppercase tracking-widest mb-3 font-semibold">Get started</p>
             <h2 className="text-3xl font-bold mb-4">Ready to build?</h2>
-            <p className="text-[#6B7280] text-sm mb-8 max-w-md mx-auto leading-relaxed">
+            <p className="text-[#374151] text-base mb-8 max-w-md mx-auto leading-relaxed">
               Flow is live on Sui testnet. Try streaming, creating a pact, or integrating the SDK into your app today.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
@@ -599,7 +599,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-base font-bold">flow<span className="text-[#2563EB]">.</span></p>
-            <div className="flex items-center gap-6 text-xs text-[#6B7280]">
+            <div className="flex items-center gap-6 text-sm text-[#4B5563]">
               <span>DeepBook</span>
               <span>Walrus</span>
               <span>Scallop</span>
@@ -607,7 +607,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
-              <span className="text-xs text-[#6B7280]">Testnet live</span>
+              <span className="text-sm text-[#4B5563]">Testnet live</span>
             </div>
           </div>
         </div>

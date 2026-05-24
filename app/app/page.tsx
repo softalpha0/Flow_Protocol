@@ -46,7 +46,7 @@ function LiveCounter({ ratePerSecond, lastWithdrawn }: { ratePerSecond: number; 
       <span className="text-[#2563EB] text-2xl font-bold">{int}</span>
       <span className="text-[#2563EB] text-2xl font-bold">.</span>
       <span className="text-[#2563EB] text-lg font-bold">{dec}</span>
-      <span className="text-[#6B7280] text-sm ml-1">SUI</span>
+      <span className="text-[#374151] text-sm ml-1">SUI</span>
     </span>
   );
 }
@@ -56,7 +56,7 @@ const PACT_STATUS_STYLE = [
   "text-amber-600 bg-amber-50 border border-amber-200",
   "text-green-600 bg-green-50 border border-green-200",
   "text-red-600 bg-red-50 border border-red-200",
-  "text-[#6B7280] bg-[#F8FAFC] border border-[#E2E8F0]",
+  "text-[#374151] bg-[#F8FAFC] border border-[#E2E8F0]",
 ];
 
 export default function Dashboard() {
@@ -137,7 +137,7 @@ export default function Dashboard() {
       <main className="min-h-screen bg-white">
         <div className="max-w-6xl mx-auto px-6 pt-40 text-center">
           <h2 className="text-2xl font-semibold mb-3">Connect your wallet</h2>
-          <p className="text-[#6B7280] text-sm">Sign in with Google or connect a Sui wallet to access your dashboard.</p>
+          <p className="text-[#374151] text-sm">Sign in with Google or connect a Sui wallet to access your dashboard.</p>
         </div>
       </main>
     );
@@ -157,7 +157,7 @@ export default function Dashboard() {
 
         {/* Back to home */}
         <div className="mb-6">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#111827] transition-colors group">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[#4B5563] hover:text-[#111827] transition-colors group">
             <svg className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 5l-7 7 7 7"/>
             </svg>
@@ -169,7 +169,7 @@ export default function Dashboard() {
         <div className="flex items-start justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-[#111827]">Dashboard</h1>
-            <p className="text-[#6B7280] text-sm mt-1">Overview of your payment flows</p>
+            <p className="text-[#374151] text-sm mt-1">Overview of your payment flows</p>
           </div>
           <div className="flex gap-2 flex-shrink-0">
             <Link href="/app/stream/new"
@@ -186,34 +186,34 @@ export default function Dashboard() {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
-            <p className="text-[10px] text-[#6B7280] uppercase tracking-wide font-medium mb-3">Total Streaming</p>
+            <p className="text-xs text-[#374151] uppercase tracking-wide font-medium mb-3">Total Streaming</p>
             {loading
               ? <div className="h-8 w-24 bg-[#E2E8F0] rounded animate-pulse" />
               : <p className="text-2xl font-bold text-[#111827]">{mistToSui(BigInt(totalDeposited))}</p>
             }
-            <p className="text-xs text-[#6B7280] mt-1">SUI deposited · {activeStreamCount} active</p>
+            <p className="text-sm text-[#4B5563] mt-1">SUI deposited · {activeStreamCount} active</p>
           </div>
 
           <div className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
-            <p className="text-[10px] text-[#6B7280] uppercase tracking-wide font-medium mb-3">Pacts Locked</p>
+            <p className="text-xs text-[#374151] uppercase tracking-wide font-medium mb-3">Pacts Locked</p>
             {loading
               ? <div className="h-8 w-24 bg-[#E2E8F0] rounded animate-pulse" />
               : <p className="text-2xl font-bold text-[#111827]">{mistToSui(BigInt(totalLocked))}</p>
             }
-            <p className="text-xs text-[#6B7280] mt-1">SUI in escrow · {myPacts.length} pact{myPacts.length !== 1 ? "s" : ""}</p>
+            <p className="text-sm text-[#4B5563] mt-1">SUI in escrow · {myPacts.length} pact{myPacts.length !== 1 ? "s" : ""}</p>
           </div>
         </div>
 
         {/* Powered By */}
         <div className="flex items-center gap-6 px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] mb-8">
-          <p className="text-[10px] text-[#6B7280] uppercase tracking-wide font-medium">Powered by</p>
+          <p className="text-xs text-[#374151] uppercase tracking-wide font-medium">Powered by</p>
           <div>
             <span className="text-xs font-semibold text-[#111827]">DeepBook</span>
-            <span className="text-xs text-[#6B7280] ml-1">Swaps</span>
+            <span className="text-sm text-[#4B5563] ml-1">Swaps</span>
           </div>
           <div>
             <span className="text-xs font-semibold text-[#111827]">Walrus</span>
-            <span className="text-xs text-[#6B7280] ml-1">Records</span>
+            <span className="text-sm text-[#4B5563] ml-1">Records</span>
           </div>
         </div>
 
@@ -233,7 +233,7 @@ export default function Dashboard() {
         {/* Streams */}
         {!loading && myStreams.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Streams</h2>
+            <h2 className="text-sm font-semibold text-[#374151] uppercase tracking-wide mb-3">Streams</h2>
             <div className="space-y-3">
               {myStreams.map((e) => {
                 const f = e.parsedJson as EventFields;
@@ -255,19 +255,19 @@ export default function Dashboard() {
                         <p className="text-sm font-semibold text-[#111827]">
                           {isSender ? `To ${shortenAddress(f.recipient)}` : `From ${shortenAddress(f.sender)}`}
                         </p>
-                        <p className="text-xs text-[#6B7280] font-mono mt-0.5">{shortenAddress(id)}</p>
+                        <p className="text-sm text-[#4B5563] font-mono mt-0.5">{shortenAddress(id)}</p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${isActive ? "text-green-600 bg-green-50 border border-green-200" : "text-[#6B7280] bg-[#F8FAFC] border border-[#E2E8F0]"}`}>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${isActive ? "text-green-600 bg-green-50 border border-green-200" : "text-[#374151] bg-[#F8FAFC] border border-[#E2E8F0]"}`}>
                         {isActive ? "Active" : "Ended"}
                       </span>
                     </div>
 
-                    <p className="text-xs text-[#6B7280] mb-1">Streamed</p>
+                    <p className="text-sm text-[#4B5563] mb-1">Streamed</p>
                     {isActive
                       ? <LiveCounter ratePerSecond={ratePerSec} lastWithdrawn={lastWithdrawn} />
-                      : <span className="text-xl font-bold text-[#6B7280] font-mono">{mistToSui(BigInt(spent))} SUI</span>
+                      : <span className="text-xl font-bold text-[#374151] font-mono">{mistToSui(BigInt(spent))} SUI</span>
                     }
-                    <p className="text-xs text-[#6B7280] mt-1 mb-3">
+                    <p className="text-sm text-[#4B5563] mt-1 mb-3">
                       of {mistToSui(BigInt(deposit))} SUI total · {mistToSui(BigInt(ratePerSec))}/sec
                     </p>
 
@@ -278,18 +278,18 @@ export default function Dashboard() {
                     <div className="flex gap-2">
                       {!isSender && isActive && (
                         <Link href={`/app/stream/${id}`}
-                          className="flex-1 py-2 rounded-lg bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] text-xs font-semibold text-center transition-colors">
+                          className="flex-1 py-2 rounded-lg bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] text-sm font-semibold text-center transition-colors">
                           Claim
                         </Link>
                       )}
                       {isSender && isActive && (
                         <Link href={`/app/stream/${id}`}
-                          className="flex-1 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold text-center transition-colors border border-red-100">
+                          className="flex-1 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-sm font-semibold text-center transition-colors border border-red-100">
                           Cancel
                         </Link>
                       )}
                       <Link href={`/app/stream/${id}`}
-                        className="flex-1 py-2 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#6B7280] hover:text-[#2563EB] text-xs font-semibold text-center transition-colors">
+                        className="flex-1 py-2 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#374151] hover:text-[#2563EB] text-sm font-semibold text-center transition-colors">
                         View
                       </Link>
                     </div>
@@ -303,7 +303,7 @@ export default function Dashboard() {
         {/* Pacts */}
         {!loading && myPacts.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-3">Pacts</h2>
+            <h2 className="text-sm font-semibold text-[#374151] uppercase tracking-wide mb-3">Pacts</h2>
             <div className="space-y-3">
               {myPacts.map((e) => {
                 const f = e.parsedJson as EventFields;
@@ -321,7 +321,7 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1 min-w-0 pr-3">
                         <p className="text-sm font-semibold text-[#111827] truncate">{desc}</p>
-                        <p className="text-xs text-[#6B7280] font-mono mt-0.5">{shortenAddress(id)}</p>
+                        <p className="text-sm text-[#4B5563] font-mono mt-0.5">{shortenAddress(id)}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-sm font-bold text-[#111827]">{mistToSui(BigInt(amount))} SUI</p>
@@ -332,20 +332,20 @@ export default function Dashboard() {
                     </div>
 
                     {deadline > 0 && (
-                      <p className="text-xs text-[#6B7280] mb-3">
+                      <p className="text-sm text-[#4B5563] mb-3">
                         Deadline: {new Date(deadline).toLocaleDateString()}
                       </p>
                     )}
 
                     {blob && blob.length > 2 && (
                       <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] mb-3">
-                        <span className="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wide">Walrus</span>
-                        <span className="text-xs text-[#6B7280] font-mono">{blob.slice(0, 14)}…</span>
+                        <span className="text-xs font-semibold text-[#374151] uppercase tracking-wide">Walrus</span>
+                        <span className="text-sm text-[#4B5563] font-mono">{blob.slice(0, 14)}…</span>
                       </div>
                     )}
 
                     <Link href={`/app/pact/${id}`}
-                      className="block w-full py-2 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#6B7280] hover:text-[#2563EB] text-xs font-semibold text-center transition-colors">
+                      className="block w-full py-2 rounded-lg border border-[#E2E8F0] hover:border-[#2563EB] text-[#374151] hover:text-[#2563EB] text-sm font-semibold text-center transition-colors">
                       View
                     </Link>
                   </div>
@@ -357,12 +357,12 @@ export default function Dashboard() {
 
         {!loading && myStreams.length === 0 && myPacts.length === 0 && (
           <div className="p-8 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-center">
-            <p className="text-sm text-[#6B7280]">No activity yet. Create a stream or pact to get started.</p>
+            <p className="text-sm text-[#374151]">No activity yet. Create a stream or pact to get started.</p>
           </div>
         )}
 
         <div className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] mt-4">
-          <p className="text-xs text-[#6B7280]">Signed in as</p>
+          <p className="text-sm text-[#4B5563]">Signed in as</p>
           <p className="font-mono text-xs mt-1 text-[#2563EB] break-all">{activeAddress}</p>
         </div>
       </div>
