@@ -19,6 +19,14 @@ type EventFields = {
   deadline?: string;
 };
 
+type InstantFields = {
+  sender: string;
+  recipient?: string;
+  amount?: string;
+  total?: string;
+  recipient_count?: string;
+};
+
 type StreamObj = {
   balance: string;
   last_withdrawn: string;
@@ -83,6 +91,18 @@ export default function Dashboard() {
     { enabled: !!activeAddress, ...queryOpts }
   );
 
+  const { data: instantEvents, isLoading: instantLoading } = useSuiClientQuery(
+    "queryEvents",
+    { query: { MoveEventType: `${ORIGINAL_PACKAGE_ID}::instant::InstantSent` }, limit: 100 },
+    { enabled: !!activeAddress, ...queryOpts }
+  );
+
+  const { data: splitEvents, isLoading: splitLoading } = useSuiClientQuery(
+    "queryEvents",
+    { query: { MoveEventType: `${ORIGINAL_PACKAGE_ID}::instant::SplitSent` }, limit: 100 },
+    { enabled: !!activeAddress, ...queryOpts }
+  );
+
   const myStreams = (streamEvents?.data ?? []).filter(e => {
     const f = e.parsedJson as EventFields;
     return f?.sender === activeAddress || f?.recipient === activeAddress;
@@ -91,6 +111,16 @@ export default function Dashboard() {
   const myPacts = (pactEvents?.data ?? []).filter(e => {
     const f = e.parsedJson as EventFields;
     return f?.sender === activeAddress || f?.recipient === activeAddress;
+  });
+
+  const myInstants = (instantEvents?.data ?? []).filter(e => {
+    const f = e.parsedJson as InstantFields;
+    return f?.sender === activeAddress || f?.recipient === activeAddress;
+  });
+
+  const mySplits = (splitEvents?.data ?? []).filter(e => {
+    const f = e.parsedJson as InstantFields;
+    return f?.sender === activeAddress;
   });
 
   const fetchStreamObjs = useCallback(async () => {
@@ -143,7 +173,7 @@ export default function Dashboard() {
     );
   }
 
-  const loading = streamsLoading || pactsLoading;
+  const loading = streamsLoading || pactsLoading || instantLoading || splitLoading;
   const totalDeposited = myStreams.reduce((s, e) => s + Number((e.parsedJson as EventFields).deposit ?? 0), 0);
   const totalLocked = myPacts.reduce((s, e) => s + Number((e.parsedJson as EventFields).amount ?? 0), 0);
   const activeStreamCount = myStreams.filter(e => {
@@ -355,9 +385,64 @@ export default function Dashboard() {
           </div>
         )}
 
-        {!loading && myStreams.length === 0 && myPacts.length === 0 && (
+        {/* Instant Sends */}
+        {!loading && (myInstants.length > 0 || mySplits.length > 0) && (
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold text-[#374151] uppercase tracking-wide mb-3">Instant Sends</h2>
+            <div className="space-y-3">
+              {myInstants.map((e, i) => {
+                const f = e.parsedJson as InstantFields;
+                const isSender = f.sender === activeAddress;
+                const amount = Number(f.amount ?? 0);
+                const ts = e.timestampMs ? new Date(Number(e.timestampMs)).toLocaleString() : "";
+                return (
+                  <div key={i} className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-sm font-semibold text-[#111827]">
+                          {isSender ? `Sent to ${shortenAddress(f.recipient ?? "")}` : `Received from ${shortenAddress(f.sender)}`}
+                        </p>
+                        {ts && <p className="text-sm text-[#4B5563] mt-0.5">{ts}</p>}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-bold text-[#111827]">{mistToSui(BigInt(amount))} SUI</p>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#2563EB] border border-[#BFDBFE] font-medium">
+                          Instant
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {mySplits.map((e, i) => {
+                const f = e.parsedJson as InstantFields;
+                const total = Number(f.total ?? 0);
+                const count = Number(f.recipient_count ?? 0);
+                const ts = e.timestampMs ? new Date(Number(e.timestampMs)).toLocaleString() : "";
+                return (
+                  <div key={`split-${i}`} className="p-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-sm font-semibold text-[#111827]">Split to {count} recipient{count !== 1 ? "s" : ""}</p>
+                        {ts && <p className="text-sm text-[#4B5563] mt-0.5">{ts}</p>}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-bold text-[#111827]">{mistToSui(BigInt(total))} SUI</p>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#F0F4FF] text-[#4F46E5] border border-[#C7D7FD] font-medium">
+                          Split
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {!loading && myStreams.length === 0 && myPacts.length === 0 && myInstants.length === 0 && mySplits.length === 0 && (
           <div className="p-8 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-center">
-            <p className="text-sm text-[#374151]">No activity yet. Create a stream or pact to get started.</p>
+            <p className="text-sm text-[#374151]">No activity yet. Create a stream, pact, or instant send to get started.</p>
           </div>
         )}
 
